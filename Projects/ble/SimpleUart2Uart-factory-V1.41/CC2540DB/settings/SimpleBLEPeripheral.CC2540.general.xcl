@@ -1,10 +1,10 @@
-"D:\software\IAR Systems\Embedded Workbench 8.1\8051\bin\8051proc.dll" 
+"D:\IAR Systems\Embedded Workbench 8.1\8051\bin\8051proc.dll" 
 
-"D:\software\IAR Systems\Embedded Workbench 8.1\8051\bin\8051emu_cc.dll" 
+"D:\IAR Systems\Embedded Workbench 8.1\8051\bin\8051emu_cc.dll" 
 
-"D:\project\Hardware\CC2540_SMART_DIAPERS_TEST\Projects\ble\SimpleUart2Uart-factory-V1.41\CC2540DB\CC2540\Exe\SimpleBLEPeripheral.d51" 
+"E:\project\Hardware\CC2540_SMART_DIAPERS\Projects\ble\SimpleUart2Uart-factory-V1.41\CC2540DB\CC2540\Exe\SimpleBLEPeripheral.d51" 
 
---plugin="D:\software\IAR Systems\Embedded Workbench 8.1\8051\bin\8051bat.dll" 
+--plugin="D:\IAR Systems\Embedded Workbench 8.1\8051\bin\8051bat.dll" 
 
 
 

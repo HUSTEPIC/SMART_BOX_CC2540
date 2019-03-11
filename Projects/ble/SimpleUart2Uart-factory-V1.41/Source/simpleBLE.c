@@ -28,7 +28,7 @@
 #include "VibrativeSensor.h"
 #include "DHT11.h"
 #include "myKey.h"
-
+#include "uart.h"
 
 #if 1
 SYS_CONFIG sys_config;
@@ -1600,17 +1600,30 @@ void simpleBLE_SendMyData_ForTest()
     static uint16 count_100ms = 0;
     count_100ms++;
     
-    if(count_100ms >= 10){//600-60s 
+    if(count_100ms >= 10){//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次
              
-      //check_keys();     //获取按键状况
-//      if(keyStateChange())   //如果按键状况发生变化，则将其内容用蓝牙发送给手机app
-//      {
+      check_keys();     //获取按键状况
+      if(keyStateChange())   //如果按键状况发生变化，则将其内容用蓝牙发送给手机app
+      {
    
+            if(DEFAULT_UP)
+            {
+              buffer[0]=~currentKeys[0];
+              buffer[1]=~currentKeys[1];
+              buffer[2]=~currentKeys[2];
+            }
+            else
+            {
+              buffer[0]=currentKeys[0];
+              buffer[1]=currentKeys[1];
+              buffer[2]=currentKeys[2];
+              
+            }
+            qq_write(buffer, 3);
+            osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
+      } 
+           
       /*
-            buffer[0]=~current_keys[0];
-            buffer[1]=~current_keys[1];
-            buffer[2]=~current_keys[2];
-     */       
       if(P1_3 ==0 )
       { 
         for(int i = 0;i<100;i++)
@@ -1634,9 +1647,11 @@ void simpleBLE_SendMyData_ForTest()
         }
           }
       }
-      
-            qq_write(buffer, 3);
-            osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
+      */
+
+            
+            updateLastKeys();
+            
 //      }
       
       

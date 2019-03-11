@@ -99,6 +99,7 @@ int main(void)
   InitLed();   //设置LED灯相应的IO口
   InitKey();   //设置S1相应的IO口
   myKey_init();
+  //InitUart();  
   
 #if 1//这一段代码和说明是 amomcu 增加的  
     // 从设置中读出以保存的数据， 以便决定现在应该是跑主机还是从机

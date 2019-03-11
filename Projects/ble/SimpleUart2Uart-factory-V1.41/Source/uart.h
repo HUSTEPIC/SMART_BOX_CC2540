@@ -11,9 +11,9 @@
 
 #include <ioCC2540.h>
 #include <string.h>
-
-typedef unsigned char uchar;
-typedef unsigned int  uint;
+#include "DHT11.h"
+//typedef unsigned char uchar;
+//typedef unsigned int  uint;
 
 #define UART0_RX    1
 #define UART0_TX    2
