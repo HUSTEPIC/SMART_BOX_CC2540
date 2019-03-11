@@ -1600,7 +1600,7 @@ void simpleBLE_SendMyData_ForTest()
     static uint16 count_100ms = 0;
     count_100ms++;
     
-    if(count_100ms >= 10){//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次
+    if(count_100ms >= 5){//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次
              
       check_keys();     //获取按键状况
       if(keyStateChange())   //如果按键状况发生变化，则将其内容用蓝牙发送给手机app

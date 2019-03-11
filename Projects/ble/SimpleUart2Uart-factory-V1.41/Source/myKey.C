@@ -68,51 +68,51 @@ void check_keys()
       {
             Delay_ms(10);
             if(KEY1==KEY_DOWN)
-            currentKeys[2] &= ~(0x01<<0);
+            currentKeys[0] &= ~(0x01<<0);
       }
      
 //      if(KEY2==KEY_DOWN)
 //      {
 //        Delay_ms(10);
 //              if(KEY2==KEY_DOWN)
-//              currentKeys[2] &= ~( 0x01<<1);
+//              currentKeys[0] &= ~( 0x01<<1);
 //                
 //      }
       if(KEY3==KEY_DOWN)
       {
         Delay_ms(10);
             if(KEY3==KEY_DOWN)
-              currentKeys[2] &= ~(0x01<<2);
+              currentKeys[0] &= ~(0x01<<2);
       }
        if(KEY4==KEY_DOWN)
       {
         Delay_ms(10);
             if(KEY4==KEY_DOWN)
-              currentKeys[2] &= ~(0x01<<3);
+              currentKeys[0] &= ~(0x01<<3);
       }
              if(KEY5==KEY_DOWN)
       {
         Delay_ms(10);
             if(KEY5==KEY_DOWN)
-              currentKeys[2] &= ~( 0x01<<4);
+              currentKeys[0] &= ~( 0x01<<4);
       }
        if(KEY6==KEY_DOWN)
       {
         Delay_ms(10);
             if(KEY6==KEY_DOWN)
-              currentKeys[2] &= ~( 0x01<<5);
+              currentKeys[0] &= ~( 0x01<<5);
       }
        if(KEY7==KEY_DOWN)
       {
         Delay_ms(10);
             if(KEY7==KEY_DOWN)
-              currentKeys[2] &= ~( 0x01<<6);
+              currentKeys[0] &= ~( 0x01<<6);
       }
        if(KEY8==KEY_DOWN)
       {
         Delay_ms(10);
             if(KEY8==KEY_DOWN)
-              currentKeys[2] &= ~( 0x01<<7);
+              currentKeys[0] &= ~( 0x01<<7);
       }
   }
   else{
@@ -129,51 +129,51 @@ void check_keys()
       {
             Delay_ms(10);
             if(KEY1==KEY_DOWN)
-            currentKeys[2] |= 0x01<<0;
+            currentKeys[0] |= 0x01<<0;
       }
      
       if(KEY2==KEY_DOWN)
       {
         Delay_ms(10);
               if(KEY2==KEY_DOWN)
-              currentKeys[2] |= 0x01<<1;
+              currentKeys[0] |= 0x01<<1;
                 
       }
       if(KEY3==KEY_DOWN)
       {
         Delay_ms(10);
             if(KEY3==KEY_DOWN)
-              currentKeys[2] |= 0x01<<2;
+              currentKeys[0] |= 0x01<<2;
       }
        if(KEY4==KEY_DOWN)
       {
         Delay_ms(10);
             if(KEY4==KEY_DOWN)
-              currentKeys[2] |= 0x01<<3;
+              currentKeys[0] |= 0x01<<3;
       }
              if(KEY5==KEY_DOWN)
       {
         Delay_ms(10);
             if(KEY5==KEY_DOWN)
-              currentKeys[2] |= 0x01<<4;
+              currentKeys[0] |= 0x01<<4;
       }
        if(KEY6==KEY_DOWN)
       {
         Delay_ms(10);
             if(KEY6==KEY_DOWN)
-              currentKeys[2] |= 0x01<<5;
+              currentKeys[0] |= 0x01<<5;
       }
        if(KEY7==KEY_DOWN)
       {
         Delay_ms(10);
             if(KEY7==KEY_DOWN)
-              currentKeys[2] |= 0x01<<6;
+              currentKeys[0] |= 0x01<<6;
       }
        if(KEY8==KEY_DOWN)
       {
         Delay_ms(10);
             if(KEY8==KEY_DOWN)
-              currentKeys[2] |= 0x01<<7;
+              currentKeys[0] |= 0x01<<7;
       }
   }
 
