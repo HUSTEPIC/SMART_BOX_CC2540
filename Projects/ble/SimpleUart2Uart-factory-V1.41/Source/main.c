@@ -96,8 +96,8 @@ int main(void)
   /* Initialize NV system */
   osal_snv_init();
   
-  InitLed();   //设置LED灯相应的IO口
-  InitKey();   //设置S1相应的IO口
+//  InitLed();   //设置LED灯相应的IO口     //这是之前振动传感器的，用了我们的io口，要注释掉
+//  InitKey();   //设置S1相应的IO口
   myKey_init();
   //InitUart();  
   

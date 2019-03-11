@@ -993,7 +993,7 @@ static void peripheralStateNotificationCB( gaprole_States_t newState )
         #if (defined HAL_LCD) && (HAL_LCD == TRUE)
           HalLcdWriteString( "Connected",  HAL_LCD_LINE_3 );
         #endif // (defined HAL_LCD) && (HAL_LCD == TRUE)
-        simpleBle_LedSetState(HAL_LED_MODE_OFF);
+        //simpleBle_LedSetState(HAL_LED_MODE_OFF);
         NPI_WriteTransport("Connected\r\n", 11);
         simpleBLE_Delay_1ms(1);  //为了等发送完整所以延时一小下
 

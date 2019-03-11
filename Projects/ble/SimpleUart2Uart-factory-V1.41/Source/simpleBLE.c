@@ -398,12 +398,12 @@ void CheckKeyForSetAllParaDefault(void)
     {
         if(P0_1 == 0)
         {
-            simpleBle_LedSetState(HAL_LED_MODE_ON);  
+            //simpleBle_LedSetState(HAL_LED_MODE_ON);  
             simpleBLE_Delay_1ms(100);
         }
         else
         {
-            simpleBle_LedSetState(HAL_LED_MODE_OFF);  
+            //simpleBle_LedSetState(HAL_LED_MODE_OFF);  
             return;
         }        
     }
@@ -414,9 +414,9 @@ void CheckKeyForSetAllParaDefault(void)
         simpleBLE_SetAllParaDefault(PARA_ALL_FACTORY);
         for(i = 0; i < 6; i++)    
         {
-            simpleBle_LedSetState(HAL_LED_MODE_ON);  
+            //simpleBle_LedSetState(HAL_LED_MODE_ON);  
             simpleBLE_Delay_1ms(100);
-            simpleBle_LedSetState(HAL_LED_MODE_OFF);
+            //simpleBle_LedSetState(HAL_LED_MODE_OFF);
             simpleBLE_Delay_1ms(100);
         }   
         // 重启， 实际上是利用看门狗了
@@ -427,12 +427,12 @@ void CheckKeyForSetAllParaDefault(void)
 #if 0
     if(P0_1 == 0)// 有按键按下
     {
-        simpleBle_LedSetState(HAL_LED_MODE_ON);  
+        //simpleBle_LedSetState(HAL_LED_MODE_ON);  
         simpleBLE_Delay_1ms(100);
     }
     else
     {
-        simpleBle_LedSetState(HAL_LED_MODE_OFF);  
+        //simpleBle_LedSetState(HAL_LED_MODE_OFF);  
         return;
     }        
 #endif
@@ -601,42 +601,12 @@ void simpleBLE_performPeriodicTask( void )
     {    
         if(GetBleRole() == BLE_ROLE_CENTRAL)//主机
         {     
-            if(simpleBle_IFfHavePeripheralMacAddr() == FALSE)//未记录地址
-            {
-                if(count == 0)
-                {
-                    simpleBle_LedSetState(HAL_LED_MODE_ON);  
-                }
-                else if(count == 1)
-                {
-                    simpleBle_LedSetState(HAL_LED_MODE_OFF);
-                }
-            }
-            else
-            {
-                if(count == 0)
-                {
-                    simpleBle_LedSetState(HAL_LED_MODE_ON);  
-                } 
-                else if(count == 9)
-                {
-                    simpleBle_LedSetState(HAL_LED_MODE_OFF);
-                }
-            }                    
+                      
             count++;
             count %= 10;     
         }  
         else//从机
         {
-            if(count == 0)
-            {
-                simpleBle_LedSetState(HAL_LED_MODE_OFF);  
-            } 
-            else if(count == 10)
-            {
-                simpleBle_LedSetState(HAL_LED_MODE_ON);
-            }
-
             count++;
             count %= 20;
         }
@@ -650,11 +620,11 @@ void simpleBLE_performPeriodicTask( void )
         
         if(count == 0)
         {
-            simpleBle_LedSetState(HAL_LED_MODE_ON);  
+            //simpleBle_LedSetState(HAL_LED_MODE_ON);  
         } 
         else if(count == 1)
         {
-            simpleBle_LedSetState(HAL_LED_MODE_OFF);
+            //simpleBle_LedSetState(HAL_LED_MODE_OFF);
         }
         count++;
         count %= 50; 

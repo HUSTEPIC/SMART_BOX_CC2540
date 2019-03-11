@@ -3,14 +3,15 @@
 //0 in 
 //1 out
 /*
-#define KEY1 P2_0
-#define KEY2 P1_3
-#define KEY3 P0_1
-#define KEY4 P1_1
-#define KEY5 P0_4
-#define KEY6 P1_4
-#define KEY7 P0_2
-#define KEY8 P0_6
+#define KEY1 P1_3
+#define KEY2 P0_6
+#define KEY3 P1_4
+#define KEY4 P0_4 //
+#define KEY5 P0_1 //
+
+#define KEY6 P0_2
+#define KEY7 P2_0  //
+#define KEY8 P1_1
 
 0   1010 1001   a9
 1   1110 0101   e5
@@ -71,13 +72,13 @@ void check_keys()
             currentKeys[0] &= ~(0x01<<0);
       }
      
-//      if(KEY2==KEY_DOWN)
-//      {
-//        Delay_ms(10);
-//              if(KEY2==KEY_DOWN)
-//              currentKeys[0] &= ~( 0x01<<1);
-//                
-//      }
+      if(KEY2==KEY_DOWN)
+      {
+        Delay_ms(10);
+              if(KEY2==KEY_DOWN)
+              currentKeys[0] &= ~( 0x01<<1);
+                
+      }
       if(KEY3==KEY_DOWN)
       {
         Delay_ms(10);
