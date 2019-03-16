@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "D:\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "E:\project\Hardware\CC2540_SMART_DIAPERS\Projects\ble\SimpleUart2Uart-factory-V1.41\CC2540DB\settings\SimpleBLEPeripheral.CC2540.general.xcl" --backend -f "E:\project\Hardware\CC2540_SMART_DIAPERS\Projects\ble\SimpleUart2Uart-factory-V1.41\CC2540DB\settings\SimpleBLEPeripheral.CC2540.driver.xcl" 
+& "D:\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "E:\project\Hardware\SMART_BOX_CC2540\Projects\ble\SimpleUart2Uart-factory-V1.41\CC2540DB\settings\SimpleBLEPeripheral.CC2540.general.xcl" --backend -f "E:\project\Hardware\SMART_BOX_CC2540\Projects\ble\SimpleUart2Uart-factory-V1.41\CC2540DB\settings\SimpleBLEPeripheral.CC2540.driver.xcl" 
 }
 else
 {
-& "D:\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "E:\project\Hardware\CC2540_SMART_DIAPERS\Projects\ble\SimpleUart2Uart-factory-V1.41\CC2540DB\settings\SimpleBLEPeripheral.CC2540.general.xcl" --debug_file=$debugfile --backend -f "E:\project\Hardware\CC2540_SMART_DIAPERS\Projects\ble\SimpleUart2Uart-factory-V1.41\CC2540DB\settings\SimpleBLEPeripheral.CC2540.driver.xcl" 
+& "D:\IAR Systems\Embedded Workbench 8.1\common\bin\cspybat" -f "E:\project\Hardware\SMART_BOX_CC2540\Projects\ble\SimpleUart2Uart-factory-V1.41\CC2540DB\settings\SimpleBLEPeripheral.CC2540.general.xcl" --debug_file=$debugfile --backend -f "E:\project\Hardware\SMART_BOX_CC2540\Projects\ble\SimpleUart2Uart-factory-V1.41\CC2540DB\settings\SimpleBLEPeripheral.CC2540.driver.xcl" 
 }

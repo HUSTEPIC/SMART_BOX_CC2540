@@ -25,10 +25,10 @@
 #include "stdlib.h"
 #include "string.h"
 #include "math.h"
-#include "VibrativeSensor.h"
+
 #include "DHT11.h"
 #include "myKey.h"
-#include "uart.h"
+
 
 #if 1
 SYS_CONFIG sys_config;
@@ -592,46 +592,10 @@ bool simpleBle_IFfHavePeripheralMacAddr( void )
         return TRUE;
 }
 //here
-// 定时器任务定时执行函数， 用于设置led的状态----也可以增加一个定时器来做
+// 定时器任务定时执行函数， 每100ms执行一次
 void simpleBLE_performPeriodicTask( void )
 {
-    static uint8 count = 0;
-
-    if(!simpleBLE_IfConnected())
-    {    
-        if(GetBleRole() == BLE_ROLE_CENTRAL)//主机
-        {     
-                      
-            count++;
-            count %= 10;     
-        }  
-        else//从机
-        {
-            count++;
-            count %= 20;
-        }
-
-#if defined(USE_DISPLAY_KEY_VALUE)  // 测试按键专用，显示5向按键值
-        SimpleBLE_DisplayTestKeyValue();       
-#endif
-    }
-    else// 连接后 主机与从机均为，LED每5秒亮100毫秒。(如果想省电， 可以不点灯)
-    {
-        
-        if(count == 0)
-        {
-            //simpleBle_LedSetState(HAL_LED_MODE_ON);  
-        } 
-        else if(count == 1)
-        {
-            //simpleBle_LedSetState(HAL_LED_MODE_OFF);
-        }
-        count++;
-        count %= 50; 
-
-        // 隔1min发送一次温湿度值
-        simpleBLE_SendMyData_ForTest();
-    }
+  simpleBLE_SendMyData_ForTest();
 }
 
 // 获取鉴权要求, 0: 连接不需要密码,  1: 连接需要密码
@@ -1554,24 +1518,20 @@ NEXT_ADC:
 }
 #endif
 
-#if 1
 //here
 /*
-很多朋友问我们， 如何实现把主机或从机上的传感器数据直接发送到对端并通过主机的串口
-透传出去， 下面我们就能实现这个功能， 不过到底需要什么样的传感器， 以及什么样的数据
-就需要你自己来组织了， 下面这个函数每100ms执行一次:
-都可以把数据发送到对端， 对端通过串口透传出去。
-下面给出一个样例: 实现把字符串发送到对方
+
+发送按键状态
+下面这个函数每100ms执行一次:
+
 */
 void simpleBLE_SendMyData_ForTest()
 {
-    uint8 buffer[3] = {3,3,3};
-    
+    uint8 buffer[3] = {3,3,3};  
     static uint16 count_100ms = 0;
     count_100ms++;
-    
-    if(count_100ms >= 5){//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次
-             
+    if(count_100ms >= 5)//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次
+    {
       check_keys();     //获取按键状况
       if(keyStateChange())   //如果按键状况发生变化，则将其内容用蓝牙发送给手机app
       {
@@ -1592,77 +1552,11 @@ void simpleBLE_SendMyData_ForTest()
             qq_write(buffer, 3);
             osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
       } 
-           
-      /*
-      if(P1_3 ==0 )
-      { 
-        for(int i = 0;i<100;i++)
-          for(int j=0;j<100;j++){
-        
-        if(P1_3 ==0 )
-        {
-          buffer[0]=0;
-        }
-          }
-      }
-      
-      if(P1_3 ==1 )
-      { 
-        for(int i = 0;i<100;i++)
-          for(int j=0;j<100;j++){
-        
-        if(P1_3 ==1 )
-        {
-          buffer[0]=1;
-        }
-          }
-      }
-      */
-
-            
-            updateLastKeys();
-            
-//      }
-      
-      
-    count_100ms=0;
-    }
-    
-#if 0  
-    static uint8 count_100ms = 0;
-    uint8 numBytes;
-
-    // 这里存在一些问题
-    
-    count_100ms++;
-    if(count_100ms == 1)//本函数每100ms被执行一次， 计数10次就是1s
-    {
-        char strTemp[24] = {0};
-
-        if((GetBleRole() == BLE_ROLE_CENTRAL) && simpleBLEChar6DoWrite && simpleBLECentralCanSend)               
-        {
-            sprintf(strTemp, "[%8ldms]Amo1\r\n", osal_GetSystemClock());
-            //把你的数据组织到 strTemp， 就ok了, 注意不要超过 SIMPLEPROFILE_CHAR6_LEN 的大小
-            //如果你发送的数据要超过 SIMPLEPROFILE_CHAR6_LEN， 那么最好的办法， 就是启动一个定时器，然后每定时器到， 就发送一段数据
-            // 定时器的启动， 请参考       osal_start_timerEx( simpleBLETaskId, SBP_PERIODIC_EVT, SBP_PERIODIC_EVT_PERIOD );
-            numBytes = (osal_strlen(strTemp) > SIMPLEPROFILE_CHAR6_LEN) ? SIMPLEPROFILE_CHAR6_LEN : osal_strlen(strTemp);            
-            simpleBLE_UartDataMain((uint8*)strTemp, numBytes);
-        }
-        else if((GetBleRole() == BLE_ROLE_PERIPHERAL) && simpleBLEChar6DoWrite2)                    
-        {
-            sprintf(strTemp, "[%8ldms]Amo2\r\n", osal_GetSystemClock());
-            //把你的数据组织到 strTemp， 就ok了, 注意不要超过 SIMPLEPROFILE_CHAR6_LEN 的大小
-            //如果你发送的数据要超过 SIMPLEPROFILE_CHAR6_LEN， 那么最好的办法， 就是启动一个定时器，然后每定时器到， 就发送一段数据
-            // 定时器的启动， 请参考       osal_start_timerEx( simpleBLETaskId, SBP_PERIODIC_EVT, SBP_PERIODIC_EVT_PERIOD );
-            numBytes = (osal_strlen(strTemp) > SIMPLEPROFILE_CHAR6_LEN) ? SIMPLEPROFILE_CHAR6_LEN : osal_strlen(strTemp);
-            simpleBLE_UartDataMain((uint8*)strTemp, numBytes);
-        }
-
-        count_100ms = 0;
-    }
-#endif    
+      updateLastKeys();
+      count_100ms=0;
+    }   
 }
-#endif
+
 
 
 static uint8 keyTestflag = ( HAL_KEY_SW_6 | HAL_KEY_UP | \

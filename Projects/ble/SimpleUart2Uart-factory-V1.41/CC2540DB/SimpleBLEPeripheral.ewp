@@ -1196,12 +1196,6 @@
         <file>
             <name>$PROJ_DIR$\..\Source\simpleBLEPeripheral.h</name>
         </file>
-        <file>
-            <name>$PROJ_DIR$\..\Source\VibrativeSensor.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Source\VibrativeSensor.h</name>
-        </file>
     </group>
     <group>
         <name>HAL</name>

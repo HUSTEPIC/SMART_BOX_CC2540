@@ -86,7 +86,7 @@
 #include "string.h"
 #include "math.h"
 #include "amomcu_buffer.h"
-#include "VibrativeSensor.h"
+
 
 /*********************************************************************
  * MACROS

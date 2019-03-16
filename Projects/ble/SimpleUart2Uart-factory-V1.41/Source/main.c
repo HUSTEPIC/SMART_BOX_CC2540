@@ -63,7 +63,7 @@
 #include "osal_snv.h"
 #include "OnBoard.h"
 #include "simpleble.h"
-#include "VibrativeSensor.h"
+
 #include "DHT11.H" 
 
 #include "myKey.h"
