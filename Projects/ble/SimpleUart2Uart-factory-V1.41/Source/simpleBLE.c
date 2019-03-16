@@ -28,7 +28,7 @@
 
 #include "DHT11.h"
 #include "myKey.h"
-
+#include "OSAL_Clock.h"
 
 #if 1
 SYS_CONFIG sys_config;
@@ -595,7 +595,30 @@ bool simpleBle_IFfHavePeripheralMacAddr( void )
 // 定时器任务定时执行函数， 每100ms执行一次
 void simpleBLE_performPeriodicTask( void )
 {
-  simpleBLE_SendMyData_ForTest();
+//  simpleBLE_SendMyData_ForTest();
+      //每秒发送时间
+    static uint16 count_100ms = 0;
+    count_100ms++;
+    if(count_100ms >= 10)
+    {   
+        char buffer[3] = {3,3,3};
+               
+        char *p = buffer;
+        UTCTimeStruct time;
+        
+        // Get time structure from OSAL
+        osal_ConvertUTCTime( &time, osal_getClock() );
+        
+        // Display is in the format:
+        // HH:MM MmmDD YYYY
+        
+          *p++ = (time.seconds  / 10) ;
+          *p++ = (time.seconds  % 10) ;
+    
+        qq_write(buffer, 3);
+        osal_set_event(simpleBLETaskId, SBP_DATA_EVT);
+        count_100ms=0;
+    }    
 }
 
 // 获取鉴权要求, 0: 连接不需要密码,  1: 连接需要密码
