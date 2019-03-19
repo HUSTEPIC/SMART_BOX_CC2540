@@ -88,6 +88,7 @@
 #include "amomcu_buffer.h"
 //here
 #include "Osal_snv.h"
+#include "OSAL_Clock.h"
 
 
 /*********************************************************************
@@ -645,12 +646,12 @@ uint16 SimpleBLEPeripheral_ProcessEvent( uint8 task_id, uint16 events )
 
     CheckKeyForSetAllParaDefault(); //按键按下3秒， 恢复出厂设置
     
-    // 延时400ms后唤醒， 不然会继续睡眠，原因不明
+    // 延时400ms后唤醒， 不然会继续睡眠，原因不明 
     osal_start_timerEx( simpleBLETaskId, SBP_WAKE_EVT, 500 );   
     
     //here test write snv------------------
-    char buffer[4] = {'t','e','s','t'};
-    osal_snv_write(0x80,4,&buffer);
+//    char buffer[4] = {6,6,6,6};
+//    osal_snv_write(0xA0,4,&buffer);
     //-------------------------------------
     return ( events ^ START_DEVICE_EVT );
   }
@@ -1020,7 +1021,7 @@ static void simpleProfileChangeCB( uint8 paramID )
   uint8 newValue;
   uint8 newChar6Value[SIMPLEPROFILE_CHAR6_LEN];
   uint8 returnBytes;
-  
+
   switch( paramID )
   {
     case SIMPLEPROFILE_CHAR1:
@@ -1029,6 +1030,8 @@ static void simpleProfileChangeCB( uint8 paramID )
       #if (defined HAL_LCD) && (HAL_LCD == TRUE)
         HalLcdWriteStringValue( "Char 1:", (uint16)(newValue), 10,  HAL_LCD_LINE_3 );
       #endif // (defined HAL_LCD) && (HAL_LCD == TRUE)
+        
+
 
       break;
 
@@ -1039,21 +1042,35 @@ static void simpleProfileChangeCB( uint8 paramID )
         HalLcdWriteStringValue( "Char 3:", (uint16)(newValue), 10,  HAL_LCD_LINE_3 );
       #endif // (defined HAL_LCD) && (HAL_LCD == TRUE)
 
+
       break;
-    
+    //写入的时间读出来
     case SIMPLEPROFILE_CHAR6:
       SimpleProfile_GetParameter( SIMPLEPROFILE_CHAR6, newChar6Value, &returnBytes );
-      if(returnBytes > 0)
-      {
-        if(simpleBLE_CheckIfUse_Uart2Uart())     //使用透传模式时才透传
-        {
-            NPI_WriteTransport(newChar6Value,returnBytes);
-            
-            // 这里可以处理一下数据，比如发命令点灯
-            // MT 命令处理 函数
-            simpleBLE_MT_CMD_Handle(newChar6Value,returnBytes);
-          }
-      }
+//      if(returnBytes > 0)
+//      {
+//        if(simpleBLE_CheckIfUse_Uart2Uart())     //使用透传模式时才透传
+//        {
+//            NPI_WriteTransport(newChar6Value,returnBytes);
+//            
+//            // 这里可以处理一下数据，比如发命令点灯
+//            // MT 命令处理 函数
+//            simpleBLE_MT_CMD_Handle(newChar6Value,returnBytes);
+//          }
+//      }
+      // here
+        //测试处理收到的数据
+      //char buffer[4] = {1,4,5,6};
+      UTCTime time ;
+      uint32 buffer32[1] ; //0 1 2 3
+      *((uint8 *)buffer32+3) = newChar6Value[0];   
+      *((uint8 *)buffer32+2) = newChar6Value[1];   
+      *((uint8 *)buffer32+1) = newChar6Value[2];   
+      *((uint8 *)buffer32+0) = newChar6Value[3];   
+      
+      time = buffer32[0];
+      osal_setClock(time);
+      //--------------------------------  
 
       break;
       

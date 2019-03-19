@@ -603,8 +603,12 @@ void simpleBLE_performPeriodicTask( void )
     if(count_100ms >= 10)
     {   
 
-        char buffer[buffer_size] = {3};
-        // -----buffer 赋为时间------------------
+      //测试串口---------------------
+      //NPI_WriteTransport("uart",4);
+//-------------------------------------------
+//        char buffer[buffer_size] = {3};
+
+//        // -----buffer 赋为UTC时间结构体------------------
 //        char *p = buffer;
 //        UTCTimeStruct time;
 //        
@@ -616,12 +620,25 @@ void simpleBLE_performPeriodicTask( void )
 //        
 //          *p++ = (time.seconds  / 10) ;
 //          *p++ = (time.seconds  % 10) ;
+//        //--------------------------------
+
+        // -----buffer 赋为UTC秒时间------------------
+        UTCTime time = osal_getClock() ;
+        uint32 buffer32[1] ; //0 1 2 3
+        buffer32[0] = time;
+        uint8 buffer8[4];    
+        buffer8[0] = *((uint8 *)buffer32+3); //3 2 1 0
+        buffer8[1] = *((uint8 *)buffer32+2);
+        buffer8[2] = *((uint8 *)buffer32+1);
+        buffer8[3] = *((uint8 *)buffer32+0);
+        
         //--------------------------------
+       
 
 //--------------buffer赋为读snv----------
-  osal_snv_read(0x80,buffer_size,&buffer);
+//  osal_snv_read(0xA0,buffer_size,&buffer);
   //--------------------------------
-        qq_write(buffer, buffer_size);
+        qq_write(buffer8, 4);
         osal_set_event(simpleBLETaskId, SBP_DATA_EVT);
         count_100ms=0;
     }    
