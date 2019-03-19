@@ -29,7 +29,7 @@
 #include "DHT11.h"
 #include "myKey.h"
 #include "OSAL_Clock.h"
-#define buffer_size 4
+
 
 #if 1
 SYS_CONFIG sys_config;
@@ -596,52 +596,10 @@ bool simpleBle_IFfHavePeripheralMacAddr( void )
 // 定时器任务定时执行函数， 每100ms执行一次
 void simpleBLE_performPeriodicTask( void )
 {
-//  simpleBLE_SendMyData_ForTest();
-      //每秒发送时间
-    static uint16 count_100ms = 0;
-    count_100ms++;
-    if(count_100ms >= 10)
-    {   
+  simpleBLE_SendMyData_ForTest();
+      
 
-      //测试串口---------------------
-      //NPI_WriteTransport("uart",4);
-//-------------------------------------------
-//        char buffer[buffer_size] = {3};
-
-//        // -----buffer 赋为UTC时间结构体------------------
-//        char *p = buffer;
-//        UTCTimeStruct time;
-//        
-//        // Get time structure from OSAL
-//        osal_ConvertUTCTime( &time, osal_getClock() );
-//        
-//        // Display is in the format:
-//        // HH:MM MmmDD YYYY
-//        
-//          *p++ = (time.seconds  / 10) ;
-//          *p++ = (time.seconds  % 10) ;
-//        //--------------------------------
-
-        // -----buffer 赋为UTC秒时间------------------
-        UTCTime time = osal_getClock() ;
-        uint32 buffer32[1] ; //0 1 2 3
-        buffer32[0] = time;
-        uint8 buffer8[4];    
-        buffer8[0] = *((uint8 *)buffer32+3); //3 2 1 0
-        buffer8[1] = *((uint8 *)buffer32+2);
-        buffer8[2] = *((uint8 *)buffer32+1);
-        buffer8[3] = *((uint8 *)buffer32+0);
-        
-        //--------------------------------
-       
-
-//--------------buffer赋为读snv----------
-//  osal_snv_read(0xA0,buffer_size,&buffer);
-  //--------------------------------
-        qq_write(buffer8, 4);
-        osal_set_event(simpleBLETaskId, SBP_DATA_EVT);
-        count_100ms=0;
-    }    
+         
 }
 
 // 获取鉴权要求, 0: 连接不需要密码,  1: 连接需要密码
@@ -1571,9 +1529,10 @@ NEXT_ADC:
 下面这个函数每100ms执行一次:
 
 */
+#define BUFFER_SIZE 7
 void simpleBLE_SendMyData_ForTest()
 {
-    uint8 buffer[3] = {3,3,3};  
+    uint8 buffer[BUFFER_SIZE] = {3};  
     static uint16 count_100ms = 0;
     count_100ms++;
     if(count_100ms >= 5)//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次
@@ -1581,7 +1540,7 @@ void simpleBLE_SendMyData_ForTest()
       check_keys();     //获取按键状况
       if(keyStateChange())   //如果按键状况发生变化，则将其内容用蓝牙发送给手机app
       {
-   
+            //前三位赋为按键状态
             if(DEFAULT_UP)
             {
               buffer[0]=~currentKeys[0];
@@ -1595,7 +1554,16 @@ void simpleBLE_SendMyData_ForTest()
               buffer[2]=currentKeys[2];
               
             }
-            qq_write(buffer, 3);
+            // 后四位赋为UTC秒时间------------------
+            UTCTime time = osal_getClock() ;
+            uint32 buffer32[1] ; //0 1 2 3
+            buffer32[0] = time;
+            //uint8 buffer8[4];    
+            buffer[3] = *((uint8 *)buffer32+3); //3 2 1 0
+            buffer[4] = *((uint8 *)buffer32+2);
+            buffer[5] = *((uint8 *)buffer32+1);
+            buffer[6] = *((uint8 *)buffer32+0);
+            qq_write(buffer, BUFFER_SIZE);
             osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
       } 
       updateLastKeys();
