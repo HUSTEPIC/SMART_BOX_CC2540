@@ -137,7 +137,7 @@ typedef uint32  uint24;
 
 // OSAL System Message IDs/Events Reserved for applications (user applications)
 // 0xE0 ñ 0xFC
-
+#define WRITE_SNV_MSG 0xFC  // ∂®“Âœ˚œ¢±Í÷æŒª
 /*********************************************************************
  * MACROS
  */
