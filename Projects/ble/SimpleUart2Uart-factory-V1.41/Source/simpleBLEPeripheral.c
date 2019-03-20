@@ -276,7 +276,7 @@ static void simpleBLEPeripheral_ProcessGATTMsg( gattMsgEvent_t *pMsg );
 static void peripheralStateNotificationCB( gaprole_States_t newState );
 static void peripheralRssiReadCB( int8 rssi );
 static void simpleProfileChangeCB( uint8 paramID );
-
+static void notifyKeyTimeData(  key_time_data *dataPtr ,uint8 *buffer );
 //#if defined( BLE_BOND_PAIR )
 typedef enum
 {
@@ -845,26 +845,14 @@ static void simpleBLEPeripheral_ProcessOSALMsg( osal_event_hdr_t *pMsg )
       break;
       //here test message
   case WRITE_SNV_MSG:
-    
-    key_time_data *dataPtr = (key_time_data *)pMsg ;
-    uint32 buffer32[1] ; //0 1 2 3
-    buffer32[0] = dataPtr->time;
-    
-    uint8 buffer[7] = {3}; 
-    buffer[0] = dataPtr->keys[0];
-    buffer[1] = dataPtr->keys[1];
-    buffer[2] = dataPtr->keys[2];
-    
-    buffer[3] = *((uint8 *)buffer32+3); //3 2 1 0
-    buffer[4] = *((uint8 *)buffer32+2);
-    buffer[5] = *((uint8 *)buffer32+1);
-    buffer[6] = *((uint8 *)buffer32+0);
-    
-    
-    qq_write(buffer, 7);
-    osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
-    break;
+    {
+      key_time_data *dataPtr = (key_time_data *)pMsg ;
+      uint8 buffer[7] = {3}; 
+      notifyKeyTimeData(  dataPtr ,buffer );
       
+     
+      break;
+    }
     default:
     // do nothing
     break;
@@ -1202,3 +1190,30 @@ static void ProcessPairStateCB( uint16 connHandle, uint8 state, uint8 status )
 //#endif
 /*********************************************************************
 *********************************************************************/
+/*********************************************************************
+ * @fn      notifyKeyTimeData
+ *
+ * @brief   notifyKeyTimeData
+ *
+ * @param   key_time_data *dataPtr
+ *
+ * @return  none
+ */
+static void notifyKeyTimeData(  key_time_data *dataPtr ,uint8 *buffer )
+{
+    uint32 buffer32[1] ; //0 1 2 3
+    buffer32[0] = dataPtr->time;
+    
+
+    buffer[0] = dataPtr->keys[0];
+    buffer[1] = dataPtr->keys[1];
+    buffer[2] = dataPtr->keys[2];
+    
+    buffer[3] = *((uint8 *)buffer32+3); //3 2 1 0
+    buffer[4] = *((uint8 *)buffer32+2);
+    buffer[5] = *((uint8 *)buffer32+1);
+    buffer[6] = *((uint8 *)buffer32+0);
+    
+    qq_write(buffer, 7);
+    osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
+}
