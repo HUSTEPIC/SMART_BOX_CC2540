@@ -597,7 +597,10 @@ bool simpleBle_IFfHavePeripheralMacAddr( void )
 void simpleBLE_performPeriodicTask( void )
 {
   simpleBLE_SendMyData_ForTest();
-      
+            //看看sys_config到底是多大啊
+  
+
+
 
          
 }

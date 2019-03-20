@@ -653,6 +653,9 @@ uint16 SimpleBLEPeripheral_ProcessEvent( uint8 task_id, uint16 events )
 //    char buffer[4] = {6,6,6,6};
 //    osal_snv_write(0xA0,4,&buffer);
     //-------------------------------------
+    
+
+      
     return ( events ^ START_DEVICE_EVT );
   }
 
@@ -1047,31 +1050,29 @@ static void simpleProfileChangeCB( uint8 paramID )
     //写入的时间读出来
     case SIMPLEPROFILE_CHAR6:
       SimpleProfile_GetParameter( SIMPLEPROFILE_CHAR6, newChar6Value, &returnBytes );
-//      if(returnBytes > 0)
-//      {
-//        if(simpleBLE_CheckIfUse_Uart2Uart())     //使用透传模式时才透传
-//        {
-//            NPI_WriteTransport(newChar6Value,returnBytes);
-//            
-//            // 这里可以处理一下数据，比如发命令点灯
-//            // MT 命令处理 函数
-//            simpleBLE_MT_CMD_Handle(newChar6Value,returnBytes);
-//          }
-//      }
-      // here
-        //测试处理收到的数据
-      //char buffer[4] = {1,4,5,6};
-      UTCTime time ;
-      uint32 buffer32[1] ; //0 1 2 3
-      *((uint8 *)buffer32+3) = newChar6Value[0];   
-      *((uint8 *)buffer32+2) = newChar6Value[1];   
-      *((uint8 *)buffer32+1) = newChar6Value[2];   
-      *((uint8 *)buffer32+0) = newChar6Value[3];   
-      
-      time = buffer32[0];
-      osal_setClock(time);
-      //--------------------------------  
 
+      // here
+      //如果第三个字节末三位有不为0的，重置时间
+      if(newChar6Value[2] & 0x07)   // 0000 0111
+      {
+        UTCTime time ;
+        uint32 buffer32[1] ; //0 1 2 3
+        *((uint8 *)buffer32+3) = newChar6Value[3];   
+        *((uint8 *)buffer32+2) = newChar6Value[4];   
+        *((uint8 *)buffer32+1) = newChar6Value[5];   
+        *((uint8 *)buffer32+0) = newChar6Value[6];   
+        time = buffer32[0];
+        osal_setClock(time);
+      }
+      else 
+      {
+        
+      }
+   
+
+
+      
+   
       break;
       
     default:
