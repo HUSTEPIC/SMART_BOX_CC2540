@@ -652,8 +652,8 @@ uint16 SimpleBLEPeripheral_ProcessEvent( uint8 task_id, uint16 events )
     osal_start_timerEx( simpleBLETaskId, SBP_WAKE_EVT, 500 );   
     
     //here  write snv------------------
-//    uint8 table[4] = {0};
-//    osal_snv_write(0x81,4,table); 
+    uint8 table[4] = {0};
+    osal_snv_write(0x81,4,table); 
     
 
       
@@ -1250,31 +1250,31 @@ static void notifyKeyTimeData(  key_time_data *dataPtr ,uint8 *buffer )
 }
 static void keyData2Snv(uint8 *buffer)
 {
-//    uint8 table[4];
-//    osal_snv_read(0x81,4,table); // 读标志位表（哪几个存储单元存有数据，哪些没有）
-//    /*
-//    ((table + 0)&(0x01<<7) == 1 ) 0x82有
-//    ((table + 0)&(0x01<<6) == 1 ) 0x83有
-//    ((table + 0)&(0x01<<5) == 1 ) 0x84有
-//    */
-//    int tableIndex = 0;
-//    int temp = 0x01;
-//    int snvItemID = 0x82;
-//
-//    for(tableIndex=0;tableIndex<4;tableIndex++)
-//    {
-//        for(temp = 0x01;temp<=0x80;temp<<=1)
-//        {
-//        if(!(table[tableIndex] & temp))  //如果table的这一位是0，表示对应存储单元空闲
-//        {
-//            osal_snv_write(snvItemID ,7,buffer);    //写入对应存储单元
-//            table[tableIndex] |= temp;       //table这一位置一，表示对应存储单元不再空闲
-//            osal_snv_write(0x81,4,table);
-//            break;
-//        }
-//        else
-//            snvItemID++;
-//
-//        }
-//    }
+    uint8 table[4];
+    osal_snv_read(0x81,4,table); // 读标志位表（哪几个存储单元存有数据，哪些没有）
+    /*
+    ((table + 0)&(0x01<<7) == 1 ) 0x82有
+    ((table + 0)&(0x01<<6) == 1 ) 0x83有
+    ((table + 0)&(0x01<<5) == 1 ) 0x84有
+    */
+    int tableIndex = 0;
+    int temp = 0x01;
+    int snvItemID = 0x82;
+
+    for(tableIndex=0;tableIndex<4;tableIndex++)
+    {
+        for(temp = 0x01;temp<=0x80;temp<<=1)
+        {
+            if(!(table[tableIndex] & temp))  //如果table的这一位是0，表示对应存储单元空闲
+            {
+                osal_snv_write(snvItemID ,7,buffer);    //写入对应存储单元
+                table[tableIndex] |= temp;       //table这一位置一，表示对应存储单元不再空闲
+                osal_snv_write(0x81,4,table);
+                break;
+            }
+            else
+                snvItemID++;
+
+        }
+    }
 } 
