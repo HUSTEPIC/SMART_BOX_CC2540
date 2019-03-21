@@ -1098,10 +1098,10 @@ static void simpleProfileChangeCB( uint8 paramID )
       {
         UTCTime time ;
         uint32 buffer32[1] ; //0 1 2 3
-        *((uint8 *)buffer32+3) = newChar6Value[3];   
-        *((uint8 *)buffer32+2) = newChar6Value[4];   
-        *((uint8 *)buffer32+1) = newChar6Value[5];   
-        *((uint8 *)buffer32+0) = newChar6Value[6];   
+        *((uint8 *)buffer32+0) = newChar6Value[3];   
+        *((uint8 *)buffer32+1) = newChar6Value[4];   
+        *((uint8 *)buffer32+2) = newChar6Value[5];   
+        *((uint8 *)buffer32+3) = newChar6Value[6];   
         time = buffer32[0];
         osal_setClock(time);
       }
@@ -1240,10 +1240,10 @@ static void notifyKeyTimeData(  key_time_data *dataPtr ,uint8 *buffer )
     buffer[1] = dataPtr->keys[1];
     buffer[2] = dataPtr->keys[2];
     
-    buffer[3] = *((uint8 *)buffer32+3); //3 2 1 0
-    buffer[4] = *((uint8 *)buffer32+2);
-    buffer[5] = *((uint8 *)buffer32+1);
-    buffer[6] = *((uint8 *)buffer32+0);
+    buffer[3] = *((uint8 *)buffer32+0); //3 2 1 0
+    buffer[4] = *((uint8 *)buffer32+1);
+    buffer[5] = *((uint8 *)buffer32+2);
+    buffer[6] = *((uint8 *)buffer32+3);
     
     qq_write(buffer, 7);
     osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
