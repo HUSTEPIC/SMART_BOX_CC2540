@@ -166,7 +166,7 @@ gaprole_States_t gapProfileState = GAPROLE_INIT;
 bool simpleBLEChar6DoWrite2 = TRUE;
 bool simpleBLEChar7DoWrite = TRUE;
 bool timerIsOn = FALSE;          // 
-
+bool Char6Response = FALSE;
 // Connection handle
 uint16 gapConnHandle = NULL;
 
@@ -277,6 +277,7 @@ static void peripheralStateNotificationCB( gaprole_States_t newState );
 static void peripheralRssiReadCB( int8 rssi );
 static void simpleProfileChangeCB( uint8 paramID );
 static void notifyKeyTimeData(  key_time_data *dataPtr ,uint8 *buffer );
+static void keyData2Snv(uint8 *buffer);
 //#if defined( BLE_BOND_PAIR )
 typedef enum
 {
@@ -650,10 +651,9 @@ uint16 SimpleBLEPeripheral_ProcessEvent( uint8 task_id, uint16 events )
     // 延时400ms后唤醒， 不然会继续睡眠，原因不明 
     osal_start_timerEx( simpleBLETaskId, SBP_WAKE_EVT, 500 );   
     
-    //here test write snv------------------
-//    char buffer[4] = {6,6,6,6};
-//    osal_snv_write(0xA0,4,&buffer);
-    //-------------------------------------
+    //here  write snv------------------
+//    uint8 table[4] = {0};
+//    osal_snv_write(0x81,4,table); 
     
 
       
@@ -848,9 +848,40 @@ static void simpleBLEPeripheral_ProcessOSALMsg( osal_event_hdr_t *pMsg )
     {
       key_time_data *dataPtr = (key_time_data *)pMsg ;
       uint8 buffer[7] = {3}; 
+      Char6Response = FALSE;
       notifyKeyTimeData(  dataPtr ,buffer );
-      
-     
+      //-----------------------------------------
+      int i=0;
+      while(Char6Response == FALSE)  //等待一段时间
+      {
+        i++;
+        if(i>500)
+          break;
+      }
+      if(Char6Response == TRUE)
+      {
+        //判断回应的内容是否是这一条数据
+        uint8 newChar6Value[SIMPLEPROFILE_CHAR6_LEN];
+        uint8 returnBytes;
+        SimpleProfile_GetParameter( SIMPLEPROFILE_CHAR6, newChar6Value, &returnBytes );
+        uint8 responseSame = str_cmp(buffer,newChar6Value,7);  //对方是否回复了一样的内容
+
+        //如果回应的内容不是这一条数据
+        if(!responseSame)
+        {
+            keyData2Snv(buffer);
+        }
+        //如果回应的内容是这一条数据，则检查内存是否有要写的
+        else
+        {
+        }
+
+      }
+      else  //没有收到主机的回应
+      {
+            keyData2Snv(buffer);
+      }
+     //-----------------------------------------
       break;
     }
     default:
@@ -1074,9 +1105,9 @@ static void simpleProfileChangeCB( uint8 paramID )
         time = buffer32[0];
         osal_setClock(time);
       }
-      else 
+      else  //主机接收到了我的数据，原封不动地发回来表示收到
       {
-        
+        Char6Response = TRUE;
       }
    
 
@@ -1217,3 +1248,33 @@ static void notifyKeyTimeData(  key_time_data *dataPtr ,uint8 *buffer )
     qq_write(buffer, 7);
     osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
 }
+static void keyData2Snv(uint8 *buffer)
+{
+//    uint8 table[4];
+//    osal_snv_read(0x81,4,table); // 读标志位表（哪几个存储单元存有数据，哪些没有）
+//    /*
+//    ((table + 0)&(0x01<<7) == 1 ) 0x82有
+//    ((table + 0)&(0x01<<6) == 1 ) 0x83有
+//    ((table + 0)&(0x01<<5) == 1 ) 0x84有
+//    */
+//    int tableIndex = 0;
+//    int temp = 0x01;
+//    int snvItemID = 0x82;
+//
+//    for(tableIndex=0;tableIndex<4;tableIndex++)
+//    {
+//        for(temp = 0x01;temp<=0x80;temp<<=1)
+//        {
+//        if(!(table[tableIndex] & temp))  //如果table的这一位是0，表示对应存储单元空闲
+//        {
+//            osal_snv_write(snvItemID ,7,buffer);    //写入对应存储单元
+//            table[tableIndex] |= temp;       //table这一位置一，表示对应存储单元不再空闲
+//            osal_snv_write(0x81,4,table);
+//            break;
+//        }
+//        else
+//            snvItemID++;
+//
+//        }
+//    }
+} 
