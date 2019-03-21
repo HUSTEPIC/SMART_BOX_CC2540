@@ -1550,7 +1550,7 @@ void simpleBLE_SendMyData_ForTest()
         //--------------------²âÊÔ message
         key_time_data *dataPtr;
         dataPtr = (key_time_data *)osal_msg_allocate( sizeof(key_time_data) );
-        dataPtr->hdr.event =  WRITE_SNV_MSG ;
+        dataPtr->hdr.event =  SendDataAndSNV ;
         if(DEFAULT_UP)
         {
           dataPtr->keys[0] = ~currentKeys[0];

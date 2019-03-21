@@ -844,7 +844,7 @@ static void simpleBLEPeripheral_ProcessOSALMsg( osal_event_hdr_t *pMsg )
       simpleBLEPeripheral_ProcessGATTMsg( (gattMsgEvent_t *)pMsg );
       break;
       //here test message
-  case WRITE_SNV_MSG:
+  case SendDataAndSNV:
     {
       key_time_data *dataPtr = (key_time_data *)pMsg ;
       uint8 buffer[7] = {3}; 
