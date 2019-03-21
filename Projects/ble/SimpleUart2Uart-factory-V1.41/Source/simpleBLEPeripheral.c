@@ -655,8 +655,14 @@ uint16 SimpleBLEPeripheral_ProcessEvent( uint8 task_id, uint16 events )
     osal_start_timerEx( simpleBLETaskId, SBP_WAKE_EVT, 500 );   
     
     //here  write snv------------------
+
     uint8 table[4] = {0};
-    osal_snv_write(0x81,4,table); 
+    int8 ret8 = osal_snv_read(0x81,4, table);
+    if(NV_OPER_FAILED == ret8)
+    {
+        osal_snv_write(0x81,4,table); 
+    }
+        
     
 
       
@@ -1284,62 +1290,62 @@ static void keyData2Snv(uint8 *buffer)
 } 
 static void onResponseSame(uint8 *response)
 {
-//    uint8 buffer[7];  //snv存的某条数据
-//    uint8 table[4];  //存储表
-//    osal_snv_read(0x81,4,table);
-//    if(table[0] || table[1] ||table[2] ||table[3])  //如果有非零的，即不空闲的存储单元，就发最开始的那一条
-//    {
-//        int tableIndex = 0;
-//        int temp = 0x01;
-//        int snvItemID = 0x82;
-//        bool flagReset = false;
-//        for(tableIndex=0;tableIndex<4;tableIndex++)
-//        {
-//            for(temp = 0x01;temp<=0x80;temp<<=1)
-//            {
-//                if((table[tableIndex] & temp))  //如果table的这一位是1，表示对应存储单元有内容
-//                {
-//                
-//                    osal_snv_read(snvItemID ,7,buffer);    //读出对应存储单元
-//                    
-//                    if(str_cmp(buffer,response,7))//如果和response相同(找到自己）
-//                    {
-//                        //清除该标志位
-//                        table[tableIndex] &= ~temp;       //table这一位置0
-//                        osal_snv_write(0x81,4,table);
-//                        flagReset = true;
-//                    }
-//                    else   //发送buffer的内容
-//                    {
-//                        //发送内容
-//                        //--------------------测试 message
-//                        uint32 buffer32[1];
-//                        uint8 *p = (uint8 *)buffer32;
-//                        key_time_data *dataPtr;
-//                        dataPtr = (key_time_data *)osal_msg_allocate( sizeof(key_time_data) );
-//                        dataPtr->hdr.event =  WRITE_SNV_MSG ;
-//
-//                        dataPtr->keys[0] = buffer[0];
-//                        dataPtr->keys[1] = buffer[1];
-//                        dataPtr->keys[2] = buffer[2];
-//                        
-//                        *(p+0) = buffer[3];
-//                        *(p+1) = buffer[4];
-//                        *(p+2) = buffer[5];
-//                        *(p+3) = buffer[6];
-//                        dataPtr ->time = buffer32[0];
-//                        osal_msg_send(simpleBLETaskId,(uint8 *)dataPtr);
-//                        if(flagReset == true) break;
-//                     }
-//                
-//                
-//                }
-//                else
-//                {
-//                    snvItemID++;
-//                }
-//          
-//            }
-//        }
-//    }
+    uint8 buffer[7];  //snv存的某条数据
+    uint8 table[4];  //存储表
+    osal_snv_read(0x81,4,table);
+    if(table[0] || table[1] ||table[2] ||table[3])  //如果有非零的，即不空闲的存储单元，就发最开始的那一条
+    {
+        int tableIndex = 0;
+        int temp = 0x01;
+        int snvItemID = 0x82;
+        bool flagReset = false;
+        for(tableIndex=0;tableIndex<4;tableIndex++)
+        {
+            for(temp = 0x01;temp<=0x80;temp<<=1)
+            {
+                if((table[tableIndex] & temp))  //如果table的这一位是1，表示对应存储单元有内容
+                {
+                
+                    osal_snv_read(snvItemID ,7,buffer);    //读出对应存储单元
+                    
+                    if(str_cmp(buffer,response,7))//如果和response相同(找到自己）
+                    {
+                        //清除该标志位
+                        table[tableIndex] &= ~temp;       //table这一位置0
+                        osal_snv_write(0x81,4,table);
+                        flagReset = true;
+                    }
+                    else   //发送buffer的内容
+                    {
+                        //发送内容
+                        //--------------------测试 message
+                        uint32 buffer32[1];
+                        uint8 *p = (uint8 *)buffer32;
+                        key_time_data *dataPtr;
+                        dataPtr = (key_time_data *)osal_msg_allocate( sizeof(key_time_data) );
+                        dataPtr->hdr.event =  SendDataAndSNV ;
+
+                        dataPtr->keys[0] = buffer[0];
+                        dataPtr->keys[1] = buffer[1];
+                        dataPtr->keys[2] = buffer[2];
+                        
+                        *(p+0) = buffer[3];
+                        *(p+1) = buffer[4];
+                        *(p+2) = buffer[5];
+                        *(p+3) = buffer[6];
+                        dataPtr ->time = buffer32[0];
+                        osal_msg_send(simpleBLETaskId,(uint8 *)dataPtr);
+                        if(flagReset == true) break;
+                     }
+                
+                
+                }
+                else
+                {
+                    snvItemID++;
+                }
+          
+            }
+        }
+    }
 }
