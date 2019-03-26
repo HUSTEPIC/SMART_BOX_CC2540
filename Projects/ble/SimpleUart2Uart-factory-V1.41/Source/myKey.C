@@ -23,9 +23,22 @@
 */
 uchar currentKeys[3];  //电平
 uchar lastKeys[3] ={0,0,0};
+Stored_data *stored_data;
 void myKey_init()
 {
-  //重新配置IO口方向
+    //开机初始化stored_data;
+    for(int i=0;i<TABLE_SIZE;i++)
+    {
+        stored_data->table[i] = 0x00;
+
+    }
+    for(int i=0;i<32;i++)
+    {
+      for(int j=0;j<7;j++)
+        stored_data->data[i][j] = 0;
+    }
+
+    //重新配置IO口方向
       P0DIR &= 0xa9; 
       P1DIR &= 0xe5; 
       P2DIR &= 0xfe; 

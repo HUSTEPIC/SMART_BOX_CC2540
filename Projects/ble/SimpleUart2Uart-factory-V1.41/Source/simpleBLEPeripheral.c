@@ -656,12 +656,12 @@ uint16 SimpleBLEPeripheral_ProcessEvent( uint8 task_id, uint16 events )
     
     //here  write snv------------------
 
-    uint8 table[4] = {0};
-    int8 ret8 = osal_snv_read(0x81,4, table);
-    if(NV_OPER_FAILED == ret8)
-    {
-        osal_snv_write(0x81,4,table); 
-    }
+//    uint8 table[4] = {0};
+//    int8 ret8 = osal_snv_read(0x81,4, table);
+//    if(NV_OPER_FAILED == ret8)
+//    {
+//        osal_snv_write(0x81,4,table); 
+//    }
         
     
 
@@ -1269,34 +1269,44 @@ static void notifyKeyTimeData(  key_time_data *dataPtr ,uint8 *buffer )
 }
 static void keyData2Snv(uint8 *buffer)
 {
-//    uint8 table[4];
-//    osal_snv_read(0x81,4,table); // 读标志位表（哪几个存储单元存有数据，哪些没有）
-//    /*
-//    ((table + 0)&(0x01<<7) == 1 ) 0x82有
-//    ((table + 0)&(0x01<<6) == 1 ) 0x83有
-//    ((table + 0)&(0x01<<5) == 1 ) 0x84有
-//    */
-//    int tableIndex = 0;
-//    int temp = 0x01;
-//    int snvItemID = 0x82;
-//
-//    for(tableIndex=0;tableIndex<4;tableIndex++)
-//    {
-//        for(temp = 0x01;temp<=0x80;temp<<=1)
-//        {
-//            if(!(table[tableIndex] & temp))  //如果table的这一位是0，表示对应存储单元空闲
-//            {
-//                osal_snv_write(snvItemID ,7,buffer);    //写入对应存储单元
-//                table[tableIndex] |= temp;       //table这一位置一，表示对应存储单元不再空闲
-//                osal_snv_write(0x81,4,table);
-//                break;
-//            }
-//            else
-//                snvItemID++;
-//
-//        }
-//    }
-} 
+   
+    /*
+    ((table + 0)&(0x01<<7) == 1 ) 0x82有
+    ((table + 0)&(0x01<<6) == 1 ) 0x83有
+    ((table + 0)&(0x01<<5) == 1 ) 0x84有
+    */
+    int tableIndex = 0;   //0~3
+    int temp = 0x01;
+    int dataItemID = 0;
+    bool saved = false;
+    for(tableIndex=0;tableIndex<TABLE_SIZE;tableIndex++)
+    {
+        for(temp = 0x01;temp<=0x80;temp<<=1)
+        {
+            if(!(stored_data->table[tableIndex] & temp))  //如果table的这一位是0，表示对应存储单元空闲
+            {
+                for(int i =0;i<DATA_SIZE;i++)
+                {
+                  stored_data->data[dataItemID][i] = buffer[i];
+                }
+                
+                stored_data->table[tableIndex] |= temp;       //table这一位置一，表示对应存储单元不再空闲
+//                //打印存储的结果
+//                qq_write(stored_data->data[dataItemID],DATA_SIZE);
+//                osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
+//                //-------------------------------------------
+                saved = true;
+                break;
+            }
+            else
+            {
+              dataItemID++;
+            }
+        }
+        if(saved == true)
+          break;
+    }
+}   
 static void onResponseSame(uint8 *response)
 {
     uint8 buffer[7];  //snv存的某条数据

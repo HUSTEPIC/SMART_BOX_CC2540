@@ -1535,7 +1535,7 @@ NEXT_ADC:
 #define BUFFER_SIZE 7
 void simpleBLE_SendMyData_ForTest()
 {
-    uint8 buffer[BUFFER_SIZE] = {3};  
+    //uint8 buffer[BUFFER_SIZE] = {3};  
     
     //--------------------
     
