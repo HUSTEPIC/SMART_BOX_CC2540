@@ -14,6 +14,8 @@
 #define KEY8 P1_1
 
 0   1010 1001   a9
+//串口的话
+//0   1010 1101   ad
 1   1110 0101   e5
 2   1111 1110   fe
 
@@ -39,7 +41,9 @@ void myKey_init()
     }
 
     //重新配置IO口方向
-      P0DIR &= 0xa9; 
+//      P0DIR &= 0xa9; 
+    
+      P0DIR &= 0xad; 
       P1DIR &= 0xe5; 
       P2DIR &= 0xfe; 
       

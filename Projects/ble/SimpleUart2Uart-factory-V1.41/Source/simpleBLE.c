@@ -1538,7 +1538,7 @@ void simpleBLE_SendMyData_ForTest()
     //uint8 buffer[BUFFER_SIZE] = {3};  
     
     //--------------------
-    
+    NPI_WriteTransport("Hello\r\n", 7);
     //--------------------
     static uint16 count_100ms = 0;
     count_100ms++;

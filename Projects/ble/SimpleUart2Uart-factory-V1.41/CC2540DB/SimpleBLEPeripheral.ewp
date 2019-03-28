@@ -299,10 +299,12 @@
                     <state>INT_HEAP_LEN=1800</state>
                     <state>HALNODEBUG</state>
                     <state>OSAL_CBTIMER_NUM_TASKS=1</state>
-                    <state>POWER_SAVING</state>
+                    <state>xPOWER_SAVING</state>
                     <state>xPLUS_BROADCASTER</state>
                     <state>HAL_LED=TRUE</state>
                     <state>xUSE_P20_LED1</state>
+                    <state>HAL_UART=TRUE</state>
+                    <state>LCD_TO_UART</state>
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
