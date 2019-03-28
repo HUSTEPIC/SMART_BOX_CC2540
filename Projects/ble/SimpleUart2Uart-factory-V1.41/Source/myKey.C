@@ -41,9 +41,9 @@ void myKey_init()
     }
 
     //重新配置IO口方向
-//      P0DIR &= 0xa9; 
+      P0DIR &= 0xa9; 
     
-      P0DIR &= 0xad; 
+//      P0DIR &= 0xad; 
       P1DIR &= 0xe5; 
       P2DIR &= 0xfe; 
       

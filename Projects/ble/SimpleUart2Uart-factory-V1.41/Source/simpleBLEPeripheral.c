@@ -1118,6 +1118,33 @@ static void simpleProfileChangeCB( uint8 paramID )
       else  //主机接收到了我的数据，原封不动地发回来表示收到
       {
         Char6Response = TRUE;
+        //查表找到这一条
+		for(int i=0;i<32;i++)
+		{
+			bool isSame = true;
+			for(int j=0;j<7;j++)
+			{
+				if(stored_data->data[i][j]!=newChar6Value[i])
+				{
+					isSame = false;
+					break;
+				}
+			}
+			if(isSame)
+			{
+//                uint8 message[1]={0x33};
+//                qq_write(message,1);
+//                osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
+				//删掉这一条
+				int tableIndex = i/8;
+				uint8 temp = 0x01;
+				temp <<= (i-8*tableIndex);
+				stored_data->table[tableIndex] &= ~temp;
+				//onResponseSame
+				onResponseSame(newChar6Value);
+                break;
+			}
+		}
       }
    
 
@@ -1309,49 +1336,43 @@ static void keyData2Snv(uint8 *buffer)
 }   
 static void onResponseSame(uint8 *response)
 {
-    uint8 buffer[7];  //snv存的某条数据
-    uint8 table[4];  //存储表
-    osal_snv_read(0x81,4,table);
-    if(table[0] || table[1] ||table[2] ||table[3])  //如果有非零的，即不空闲的存储单元，就发最开始的那一条
+    if(stored_data->table[0]!=0 || stored_data->table[1]!=0 ||stored_data->table[2]!=0 ||stored_data->table[3]!=0)  //如果有非零的，即不空闲的存储单元，就发最开始的那一条
     {
         int tableIndex = 0;
         int temp = 0x01;
-        int snvItemID = 0x82;
+        int snvItemID = 0;
         bool flagReset = false;
         for(tableIndex=0;tableIndex<4;tableIndex++)
         {
             for(temp = 0x01;temp<=0x80;temp<<=1)
             {
-                if((table[tableIndex] & temp))  //如果table的这一位是1，表示对应存储单元有内容
-                {
-                
-                    osal_snv_read(snvItemID ,7,buffer);    //读出对应存储单元
-                    
-                    if(str_cmp(buffer,response,7))//如果和response相同(找到自己）
+                if((stored_data->table[tableIndex] & temp))  //如果table的这一位是1，表示对应存储单元有内容
+                {       
+                    if(str_cmp(stored_data->data[snvItemID],response,7))//如果和response相同(找到自己）
                     {
                         //清除该标志位
-                        table[tableIndex] &= ~temp;       //table这一位置0
-                        osal_snv_write(0x81,4,table);
+                        stored_data->table[tableIndex] &= ~temp;       //table这一位置0
+                        
                         flagReset = true;
                     }
-                    else   //发送buffer的内容
+                    else   //发送stored_data->data[snvItemID]的内容
                     {
                         //发送内容
-                        //--------------------测试 message
+                        //--------------------
                         uint32 buffer32[1];
                         uint8 *p = (uint8 *)buffer32;
                         key_time_data *dataPtr;
                         dataPtr = (key_time_data *)osal_msg_allocate( sizeof(key_time_data) );
                         dataPtr->hdr.event =  SendDataAndSNV ;
 
-                        dataPtr->keys[0] = buffer[0];
-                        dataPtr->keys[1] = buffer[1];
-                        dataPtr->keys[2] = buffer[2];
+                        dataPtr->keys[0] = stored_data->data[snvItemID][0];
+                        dataPtr->keys[1] = stored_data->data[snvItemID][1];
+                        dataPtr->keys[2] = stored_data->data[snvItemID][2];
                         
-                        *(p+3) = buffer[3];
-                        *(p+2) = buffer[4];
-                        *(p+1) = buffer[5];
-                        *(p+0) = buffer[6];
+                        *(p+3) = stored_data->data[snvItemID][3];
+                        *(p+2) = stored_data->data[snvItemID][4];
+                        *(p+1) = stored_data->data[snvItemID][5];
+                        *(p+0) = stored_data->data[snvItemID][6];
                         dataPtr ->time = buffer32[0];
                         osal_msg_send(simpleBLETaskId,(uint8 *)dataPtr);
                         if(flagReset == true) break;
