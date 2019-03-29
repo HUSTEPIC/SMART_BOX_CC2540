@@ -1970,7 +1970,7 @@ void simpleBLE_SendMyData_ForTest()
     //--------------------
     static uint16 count_100ms = 0;
     count_100ms++;
-    if(count_100ms >= 100)//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次
+    if(count_100ms >= 5)//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次
     {
       check_keys();     //获取按键状况
 //      if(keyStateChange())   //如果按键状况发生变化，则将其内容用蓝牙发送给手机app
@@ -1996,7 +1996,13 @@ void simpleBLE_SendMyData_ForTest()
         dataPtr ->time = osal_getClock() ;
         osal_msg_send(simpleBLETaskId,(uint8 *)dataPtr);
         //--------------------
-
+        //测试定时发送蓝牙
+        	    //notify ----------
+//	uint8 message[1]={0x44};
+//	static attHandleValueNoti_t pReport;
+//	pReport.len = 1;
+//	osal_memcpy(pReport.pValue,message,1);
+//	GATT_Notification(0,&pReport,false);
       } 
       updateLastKeys();
       count_100ms=0;
