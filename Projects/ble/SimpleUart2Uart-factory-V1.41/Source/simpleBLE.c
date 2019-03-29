@@ -1521,80 +1521,6 @@ NEXT_ADC:
 }
 #endif
 
-//here
-/*
-
-发送按键状态
-下面这个函数每100ms执行一次:
-
-*/
-#define BUFFER_SIZE 7
-void simpleBLE_SendMyData_ForTest()
-{
-    //uint8 buffer[BUFFER_SIZE] = {3};  
-    
-    //--------------------
-    //NPI_WriteTransport("Hello\r\n", 7);
-    //--------------------
-    static uint16 count_100ms = 0;
-    count_100ms++;
-    if(count_100ms >= 100)//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次
-    {
-      check_keys();     //获取按键状况
-//      if(keyStateChange())   //如果按键状况发生变化，则将其内容用蓝牙发送给手机app
-      if(1)
-      {
-        //--------------------测试 message
-        key_time_data *dataPtr;
-        dataPtr = (key_time_data *)osal_msg_allocate( sizeof(key_time_data) );
-        dataPtr->hdr.event =  SendDataAndSNV ;
-        if(DEFAULT_UP)
-        {
-          dataPtr->keys[0] = ~currentKeys[0];
-          dataPtr->keys[1]=~currentKeys[1];
-          dataPtr->keys[2]=~currentKeys[2];
-        }
-        else
-        {
-          dataPtr->keys[0]=currentKeys[0];
-          dataPtr->keys[1]=currentKeys[1];
-          dataPtr->keys[2]=currentKeys[2];
-          
-        }
-        dataPtr ->time = osal_getClock() ;
-        osal_msg_send(simpleBLETaskId,(uint8 *)dataPtr);
-        //--------------------
-//            //前三位赋为按键状态
-//            if(DEFAULT_UP)
-//            {
-//              buffer[0]=~currentKeys[0];
-//              buffer[1]=~currentKeys[1];
-//              buffer[2]=~currentKeys[2];
-//            }
-//            else
-//            {
-//              buffer[0]=currentKeys[0];
-//              buffer[1]=currentKeys[1];
-//              buffer[2]=currentKeys[2];
-//              
-//            }
-//            // 后四位赋为UTC秒时间------------------
-//            UTCTime time = osal_getClock() ;
-//            uint32 buffer32[1] ; //0 1 2 3
-//            buffer32[0] = time;
-//            //uint8 buffer8[4];    
-//            buffer[3] = *((uint8 *)buffer32+3); //3 2 1 0
-//            buffer[4] = *((uint8 *)buffer32+2);
-//            buffer[5] = *((uint8 *)buffer32+1);
-//            buffer[6] = *((uint8 *)buffer32+0);
-//            qq_write(buffer, BUFFER_SIZE);
-//            osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
-      } 
-      updateLastKeys();
-      count_100ms=0;
-    }   
-}
-
 
 
 static uint8 keyTestflag = ( HAL_KEY_SW_6 | HAL_KEY_UP | \
@@ -2026,3 +1952,55 @@ void SimpleBLE_DisplayTestKeyValue()
     }
 }
 #endif
+
+//here
+/*
+
+发送按键状态
+下面这个函数每100ms执行一次:
+
+*/
+#define BUFFER_SIZE 7
+void simpleBLE_SendMyData_ForTest()
+{
+    //uint8 buffer[BUFFER_SIZE] = {3};  
+    
+    //--------------------
+    //NPI_WriteTransport("Hello\r\n", 7);
+    //--------------------
+    static uint16 count_100ms = 0;
+    count_100ms++;
+    if(count_100ms >= 100)//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次
+    {
+      check_keys();     //获取按键状况
+//      if(keyStateChange())   //如果按键状况发生变化，则将其内容用蓝牙发送给手机app
+      if(1)
+      {
+        //--------------------测试 message
+        key_time_data *dataPtr;
+        dataPtr = (key_time_data *)osal_msg_allocate( sizeof(key_time_data) );
+        dataPtr->hdr.event =  SendDataAndSNV ;
+        if(DEFAULT_UP)
+        {
+          dataPtr->keys[0] = ~currentKeys[0];
+          dataPtr->keys[1]=~currentKeys[1];
+          dataPtr->keys[2]=~currentKeys[2];
+        }
+        else
+        {
+          dataPtr->keys[0]=currentKeys[0];
+          dataPtr->keys[1]=currentKeys[1];
+          dataPtr->keys[2]=currentKeys[2];
+          
+        }
+        dataPtr ->time = osal_getClock() ;
+        osal_msg_send(simpleBLETaskId,(uint8 *)dataPtr);
+        //--------------------
+
+      } 
+      updateLastKeys();
+      count_100ms=0;
+    }   
+}
+
+
