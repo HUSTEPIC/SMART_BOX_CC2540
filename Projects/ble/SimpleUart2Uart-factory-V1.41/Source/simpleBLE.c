@@ -597,12 +597,8 @@ bool simpleBle_IFfHavePeripheralMacAddr( void )
 void simpleBLE_performPeriodicTask( void )
 {
   simpleBLE_SendMyData_ForTest();
-            //看看sys_config到底是多大啊
-  
-
-
-
-         
+    
+   
 }
 
 // 获取鉴权要求, 0: 连接不需要密码,  1: 连接需要密码
@@ -1538,14 +1534,15 @@ void simpleBLE_SendMyData_ForTest()
     //uint8 buffer[BUFFER_SIZE] = {3};  
     
     //--------------------
-    NPI_WriteTransport("Hello\r\n", 7);
+    //NPI_WriteTransport("Hello\r\n", 7);
     //--------------------
     static uint16 count_100ms = 0;
     count_100ms++;
-    if(count_100ms >= 5)//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次
+    if(count_100ms >= 100)//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次
     {
       check_keys();     //获取按键状况
-      if(keyStateChange())   //如果按键状况发生变化，则将其内容用蓝牙发送给手机app
+//      if(keyStateChange())   //如果按键状况发生变化，则将其内容用蓝牙发送给手机app
+      if(1)
       {
         //--------------------测试 message
         key_time_data *dataPtr;
