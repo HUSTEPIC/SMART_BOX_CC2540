@@ -2038,7 +2038,10 @@ void sendStoredData()
                     {
                         qq_write(stored_data->data[snvItemID], BUFFER_SIZE);
                         osal_set_event(simpleBLETaskId, SBP_DATA_EVT);
-                    }                       
+                    }   
+                    // 清除标志位
+                    if(simpleBLE_IfConnected()&& android_ready)
+                        stored_data->table[tableIndex] &= ~temp;
                     return;
                 }
                 else

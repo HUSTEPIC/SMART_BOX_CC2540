@@ -1191,22 +1191,5 @@ void onWriteChar6(uint8 *newChar6Value)
     time = buffer32[0];
     osal_setClock(time);
   }
-  else  //主机接收到了我的数据，原封不动地发回来表示收到
-  {
 
-    //查表找到这一条
-    for(int i=0;i<32;i++)
-    {
-        if(str_cmp(stored_data->data[i],newChar6Value,7))  //如果找到这一条
-        {
-
-            //删掉这一条
-            int tableIndex = i/8;
-            uint8 temp = 0x01;
-            temp <<= (i-8*tableIndex);
-            stored_data->table[tableIndex] &= ~temp;
-            break;
-        }
-    } 
-  }  
 }
