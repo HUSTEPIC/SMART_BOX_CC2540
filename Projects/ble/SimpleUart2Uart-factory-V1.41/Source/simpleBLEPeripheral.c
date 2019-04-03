@@ -1296,9 +1296,9 @@ static void onResponseSame(uint8 *response)
         //发table内容看看
         
                         //---------------------
-                        uint8 message[1]={0x33};
-                        qq_write(message, 1);
-                        osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
+//                        uint8 message[1]={0x33};
+//                        qq_write(message, 1);
+//                        osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
                         //-------------------------
         //----------------------------------------------------
       //串口发送
@@ -1395,15 +1395,16 @@ void onWriteChar6(uint8 *newChar6Value)
             stored_data->table[tableIndex] &= ~temp;
 			
 			//-----------------------
-			 uint8 message[5];
-			 message[0] = 0x55;
-			 message[1] = i;
-			 message[2] = tableIndex;
-			 message[3] = temp;
-			 message[4] = stored_data->table[tableIndex];
-			
-			 qq_write(message, 5);
-			 osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
+            //我在这儿我在这儿
+//			 uint8 message[5];
+//			 message[0] = 0x55;
+//			 message[1] = i;
+//			 message[2] = tableIndex;
+//			 message[3] = temp;
+//			 message[4] = stored_data->table[tableIndex];
+//			
+//			 qq_write(message, 5);
+//			 osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
 			//-----------------------
 			
             //onResponseSame 检查有没有存的要发
