@@ -1953,60 +1953,152 @@ void SimpleBLE_DisplayTestKeyValue()
 }
 #endif
 
+#define BUFFER_SIZE 7
+void saveKeyData(uint8 *buffer)  //把buffer存到stored_data->data
+{
+    int tableIndex = 0;   //0~3
+    int temp = 0x01;
+    int dataItemID = 0;
+    bool saved = false;
+    for(tableIndex=0;tableIndex<TABLE_SIZE;tableIndex++)
+    {
+        for(temp = 0x01;temp<=0x80;temp<<=1)
+        {
+            if(!(stored_data->table[tableIndex] & temp))  //如果table的这一位是0，表示对应存储单元空闲
+            {
+                for(int i =0;i<DATA_SIZE;i++)
+                {
+                  stored_data->data[dataItemID][i] = buffer[i];
+                }
+                
+                stored_data->table[tableIndex] |= temp;       //table这一位置一，表示对应存储单元不再空闲/                	//notify存储的结果
+                saved = true;
+                break;
+            }
+            else
+            {
+                dataItemID++;
+            }
+        }
+        if(saved == true)
+			break;
+    }
+}
+void keyTime2Buffer(uint8 *buffer)
+{
+    //前三个字节赋为按键状态
+    if(DEMO)
+    {
+        buffer[0] = currentKeys[0];
+        buffer[1] = currentKeys[1];
+        buffer[2] = currentKeys[2];
+    }
+    else
+    {
+        buffer[0] = ~currentKeys[0];
+        buffer[1] = ~currentKeys[1];
+        buffer[2] = ~currentKeys[2]; 
+    }
+    buffer[2] &= 0xf8;  //后三位是0
+    // 后四个字节赋为UTC秒时间------------------
+    UTCTime time = osal_getClock() ;
+    uint32 buffer32[1] ; //0 1 2 3
+    buffer32[0] = time;
+    //uint8 buffer8[4];    
+    buffer[3] = *((uint8 *)buffer32+3); //3 2 1 0
+    buffer[4] = *((uint8 *)buffer32+2);
+    buffer[5] = *((uint8 *)buffer32+1);
+    buffer[6] = *((uint8 *)buffer32+0);
+}
+
+
+void sendStoredData()
+{
+    if(stored_data->table[0]!=0 || stored_data->table[1]!=0 ||stored_data->table[2]!=0 ||stored_data->table[3]!=0)  //如果有非零的，即不空闲的存储单元，就发最开始的那一条
+    {
+        int tableIndex = 0;
+        int temp = 0x01;
+        int snvItemID = 0;
+        for(tableIndex=0;tableIndex<4;tableIndex++)
+        {
+            for(temp = 0x01;temp<=0x80;temp<<=1)
+            {
+                if((stored_data->table[tableIndex] & temp))  //如果table的这一位是1，表示对应存储单元有内容，发送后return ;
+                {     
+                    if(simpleBLE_IfConnected()&& android_ready)
+                    {
+                        qq_write(stored_data->data[snvItemID], BUFFER_SIZE);
+                        osal_set_event(simpleBLETaskId, SBP_DATA_EVT);
+                    }   
+                    // 清除标志位
+                    if(simpleBLE_IfConnected()&& android_ready)
+                        stored_data->table[tableIndex] &= ~temp;
+                    return;
+                }
+                else
+                {
+                    snvItemID++;
+                }
+                      
+            }
+        }
+    }
+}
 //here
 /*
-
+定时事件
 发送按键状态
 下面这个函数每100ms执行一次:
 
 */
-#define BUFFER_SIZE 7
+
 void simpleBLE_SendMyData_ForTest()
 {
-    //uint8 buffer[BUFFER_SIZE] = {3};  
-    
-    //--------------------
-    //NPI_WriteTransport("Hello\r\n", 7);
-    //--------------------
+    uint8 buffer[BUFFER_SIZE] = {3};  
     static uint16 count_100ms = 0;
+    static uint16 count_500ms = 0;
     count_100ms++;
-    if(count_100ms >= 5)//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次
+
+    if(count_100ms >= 5)//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次  //每隔500ms执行以下内容
     {
-      check_keys();     //获取按键状况
-//      if(keyStateChange())   //如果按键状况发生变化，则将其内容用蓝牙发送给手机app
-      if(1)
-      {
-        //--------------------测试 message
-        key_time_data *dataPtr;
-        dataPtr = (key_time_data *)osal_msg_allocate( sizeof(key_time_data) );
-        dataPtr->hdr.event =  SendDataAndSNV ;
-        if(DEFAULT_UP)
+        //如果蓝牙没连上
+        if(!simpleBLE_IfConnected())
         {
-          dataPtr->keys[0] = ~currentKeys[0];
-          dataPtr->keys[1]=~currentKeys[1];
-          dataPtr->keys[2]=~currentKeys[2];
+            android_ready = false;
         }
-        else
+        check_keys();     //获取按键状况
+        if(keyStateChange())   //如果按键状况发生变化，则将其内容用蓝牙发送给手机app
         {
-          dataPtr->keys[0]=currentKeys[0];
-          dataPtr->keys[1]=currentKeys[1];
-          dataPtr->keys[2]=currentKeys[2];
-          
+            keyTime2Buffer(buffer);  //把按键数据和当前时间存到buffer
+            if(simpleBLE_IfConnected()&& android_ready)  //如果连上了蓝牙，发送消息
+            {
+                qq_write(buffer, BUFFER_SIZE);
+                osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
+                if(!simpleBLE_IfConnected())   //如果发完消息发现没连上蓝牙，就保存数据
+                {
+                    saveKeyData(buffer);
+                    android_ready = false;
+                }
+            }
+            else    //如果此时没连上蓝牙，也保存数据
+            {
+                saveKeyData(buffer);
+                android_ready = false;
+            }
+            
+        } //end of if keyStateChange()
+        else     //按键状态没变
+        {
+            if(count_500ms>=6)  //每隔三秒判断是否有存储的数据要发送
+            {
+                sendStoredData();
+            }
         }
-        dataPtr ->time = osal_getClock() ;
-        osal_msg_send(simpleBLETaskId,(uint8 *)dataPtr);
-        //--------------------
-        //测试定时发送蓝牙
-        	    //notify ----------
-//	uint8 message[1]={0x44};
-//	static attHandleValueNoti_t pReport;
-//	pReport.len = 1;
-//	osal_memcpy(pReport.pValue,message,1);
-//	GATT_Notification(0,&pReport,false);
-      } 
+                
       updateLastKeys();
       count_100ms=0;
-    }   
+      count_500ms ++;  //每500ms自增
+    }
 }
 
 

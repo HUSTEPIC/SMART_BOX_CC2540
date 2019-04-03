@@ -26,6 +26,7 @@
 uchar currentKeys[3];  //电平
 uchar lastKeys[3] ={0,0,0};
 Stored_data *stored_data;
+bool android_ready;
 void myKey_init()
 {
     //开机初始化stored_data;
@@ -39,6 +40,7 @@ void myKey_init()
       for(int j=0;j<7;j++)
         stored_data->data[i][j] = 0;
     }
+    android_ready = false;
 
     //重新配置IO口方向
       P0DIR &= 0xa9; 
@@ -47,7 +49,7 @@ void myKey_init()
       P1DIR &= 0xe5; 
       P2DIR &= 0xfe; 
       
-      if(DEFAULT_UP)
+      if(DEMO)
       {
           /*默认松开*/
           //currentKeys 置1
@@ -71,7 +73,7 @@ void myKey_init()
 
 void check_keys()
 {
-  if(DEFAULT_UP)
+  if(DEMO)
   {
      /*默认松开*/
           //currentKeys 置1
