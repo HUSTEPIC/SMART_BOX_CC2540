@@ -2031,11 +2031,14 @@ void sendStoredData()
         for(tableIndex=0;tableIndex<4;tableIndex++)
         {
             for(temp = 0x01;temp<=0x80;temp<<=1)
-                        {
+            {
                 if((stored_data->table[tableIndex] & temp))  //如果table的这一位是1，表示对应存储单元有内容，发送后return ;
-                {       
-                    qq_write(stored_data->data[snvItemID], BUFFER_SIZE);
-                    osal_set_event(simpleBLETaskId, SBP_DATA_EVT);                                    
+                {     
+                    if(simpleBLE_IfConnected()&& android_ready)
+                    {
+                        qq_write(stored_data->data[snvItemID], BUFFER_SIZE);
+                        osal_set_event(simpleBLETaskId, SBP_DATA_EVT);
+                    }                       
                     return;
                 }
                 else
@@ -2064,20 +2067,29 @@ void simpleBLE_SendMyData_ForTest()
 
     if(count_100ms >= 5)//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次  //每隔500ms执行以下内容
     {
+        //如果蓝牙没连上
+        if(!simpleBLE_IfConnected())
+        {
+            android_ready = false;
+        }
         check_keys();     //获取按键状况
         if(keyStateChange())   //如果按键状况发生变化，则将其内容用蓝牙发送给手机app
         {
             keyTime2Buffer(buffer);  //把按键数据和当前时间存到buffer
-            if(simpleBLE_IfConnected())  //如果连上了蓝牙，发送消息
+            if(simpleBLE_IfConnected()&& android_ready)  //如果连上了蓝牙，发送消息
             {
                 qq_write(buffer, BUFFER_SIZE);
                 osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
                 if(!simpleBLE_IfConnected())   //如果发完消息发现没连上蓝牙，就保存数据
-                  saveKeyData(buffer);
+                {
+                    saveKeyData(buffer);
+                    android_ready = false;
+                }
             }
             else    //如果此时没连上蓝牙，也保存数据
             {
                 saveKeyData(buffer);
+                android_ready = false;
             }
             
         } //end of if keyStateChange()

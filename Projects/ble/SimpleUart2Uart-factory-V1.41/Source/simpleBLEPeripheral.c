@@ -277,11 +277,11 @@ static void peripheralStateNotificationCB( gaprole_States_t newState );
 static void peripheralRssiReadCB( int8 rssi );
 static void simpleProfileChangeCB( uint8 paramID );
 //-------------------------------------------------------//
-static void notifyKeyTimeData(  key_time_data *dataPtr ,uint8 *buffer );
-static void keyData2Snv(uint8 *buffer);
-static void onResponseSame(uint8 *response);
+
+
+
 static void onWriteChar6(uint8 *newChar6Value);
-static void onMessage(osal_event_hdr_t *pMsg);
+
 //-------------------------------------------------------//
 //#if defined( BLE_BOND_PAIR )
 typedef enum
@@ -854,14 +854,7 @@ static void simpleBLEPeripheral_ProcessOSALMsg( osal_event_hdr_t *pMsg )
       // Process GATT message
       simpleBLEPeripheral_ProcessGATTMsg( (gattMsgEvent_t *)pMsg );
       break;
-      //here test message
-      //消息处理
-  case SendDataAndSNV:
-    {
-      onMessage(pMsg);
-     
-      break;
-    }
+
     default:
     // do nothing
     break;
@@ -1180,180 +1173,12 @@ static void ProcessPairStateCB( uint16 connHandle, uint8 state, uint8 status )
 *********************************************************************/
 
 #define DEMO 1
-static void notifyKeyTimeData(  key_time_data *dataPtr ,uint8 *buffer )
-{
-    uint32 buffer32[1] ; //0 1 2 3
-    buffer32[0] = dataPtr->time;
-    
-    if(DEMO)
-    {
-        buffer[0] = ~dataPtr->keys[0];
-        buffer[1] = ~dataPtr->keys[1];
-        buffer[2] = ~dataPtr->keys[2];
-        buffer[2] &= 0xf8;   //1111 1000
-    }
-    else
-    {
-        buffer[0] = dataPtr->keys[0];
-        buffer[1] = dataPtr->keys[1];
-        buffer[2] = dataPtr->keys[2];
-    }
-    buffer[3] = *((uint8 *)buffer32+3); //3 2 1 0
-    buffer[4] = *((uint8 *)buffer32+2);
-    buffer[5] = *((uint8 *)buffer32+1);
-    buffer[6] = *((uint8 *)buffer32+0 );
-    
-    qq_write(buffer, 7);
-    osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
-          //串口发送
-        char strTemp[64];
-        sprintf(strTemp, "\r\nrecData:%x%x%x%x%x%x%x\r\n", buffer[0],buffer[1],buffer[2],buffer[3],buffer[4],buffer[5],buffer[6]);
-        NPI_WriteTransport(strTemp, osal_strlen(strTemp));
-}
-static void keyData2Snv(uint8 *buffer)
-{
-   
-    //串口发送
-    char strTemp[64];
-    sprintf(strTemp, "keyData2Snv\r\n");
-    NPI_WriteTransport(strTemp, osal_strlen(strTemp));
-	//---------------	
-    // //notify 1----------
-	// uint8 message[1]={0x11};
-	// qq_write(message, 1);
-    // osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
-	//---------------
-    int tableIndex = 0;   //0~3
-    int temp = 0x01;
-    int dataItemID = 0;
-    bool saved = false;
-    for(tableIndex=0;tableIndex<TABLE_SIZE;tableIndex++)
-    {
-        for(temp = 0x01;temp<=0x80;temp<<=1)
-        {
-            if(!(stored_data->table[tableIndex] & temp))  //如果table的这一位是0，表示对应存储单元空闲
-            {
-				//串口发送table 情况
-				// char strTemp[64];
-				// sprintf(strTemp, "keyData2Snv: if!: \r\n%x%x%x%x\r\n\r\n", stored_data->table[0], stored_data->table[1], stored_data->table[2], stored_data->table[3]);
-				// NPI_WriteTransport(strTemp, osal_strlen(strTemp));
-                //-------------------------------------------
-				//notify 2----------
-				// uint8 message[1]={0x22};
-				// qq_write(message, 1);
-				// osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
-				//---------------
-                for(int i =0;i<DATA_SIZE;i++)
-                {
-                  stored_data->data[dataItemID][i] = buffer[i];
-                }
-                
-                stored_data->table[tableIndex] |= temp;       //table这一位置一，表示对应存储单元不再空闲/                	//notify存储的结果
 
 
-
-                saved = true;
-                break;
-            }
-            else
-            {
-                dataItemID++;
-                //串口发送table 情况
-				// char strTemp[64];
-				// sprintf(strTemp, "keyData2Snv: else: \r\n%x%x%x%x\r\n\r\n", stored_data->table[0], stored_data->table[1], stored_data->table[2], stored_data->table[3]);
-				// NPI_WriteTransport(strTemp, osal_strlen(strTemp));
-                //-------------------------------------------
-            }
-        }
-        if(saved == true)
-			break;
-    }
-}   
-static void onResponseSame(uint8 *response)
-{
-	   //串口发送
-       char strTemp[64];
-       sprintf(strTemp, "onResponseSame\r\n", sys_config.pass);
-       NPI_WriteTransport((uint8*)strTemp, osal_strlen(strTemp));
-	       //notify ----------
-			//-----------------------
-			 // uint8 message[5]={0x66};
-			 // message[1] = stored_data->table[0];
-			 // message[2] = stored_data->table[1];
-			 // message[3] = stored_data->table[2];
-			 // message[4] = stored_data->table[3];
-			 // qq_write(message, 5);
-			 // osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
-			//-----------------------
-	//---------------	
-
-    if(stored_data->table[0]!=0 || stored_data->table[1]!=0 ||stored_data->table[2]!=0 ||stored_data->table[3]!=0)  //如果有非零的，即不空闲的存储单元，就发最开始的那一条
-    {
-			      //串口发送
-       char strTemp[64];
-       sprintf(strTemp, "onResponseSame:if\r\n", sys_config.pass);
-       NPI_WriteTransport((uint8*)strTemp, osal_strlen(strTemp));
-        //发table内容看看
-        
-                        //---------------------
-//                        uint8 message[1]={0x33};
-//                        qq_write(message, 1);
-//                        osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
-                        //-------------------------
-        //----------------------------------------------------
-      //串口发送
-//        char strTemp[64];
-//        sprintf(strTemp, "Password:%s\r\n", sys_config.pass);
-//        NPI_WriteTransport((uint8*)strTemp, osal_strlen(strTemp));
-        
-        int tableIndex = 0;
-        int temp = 0x01;
-        int snvItemID = 0;
-        bool flagReset = false;
-        for(tableIndex=0;tableIndex<4;tableIndex++)
-        {
-            for(temp = 0x01;temp<=0x80;temp<<=1)
-            {
-                if((stored_data->table[tableIndex] & temp))  //如果table的这一位是1，表示对应存储单元有内容，发送后return ;
-                {       
-
-
-                        uint32 buffer32[1];
-                        uint8 *p = (uint8 *)buffer32;
-                        key_time_data *dataPtr;
-                        dataPtr = (key_time_data *)osal_msg_allocate( sizeof(key_time_data) );
-                        dataPtr->hdr.event =  SendDataAndSNV ;
-
-                        dataPtr->keys[0] = stored_data->data[snvItemID][0];
-                        dataPtr->keys[1] = stored_data->data[snvItemID][1];
-                        dataPtr->keys[2] = stored_data->data[snvItemID][2];
-                        
-                        *(p+3) = stored_data->data[snvItemID][3];
-                        *(p+2) = stored_data->data[snvItemID][4];
-                        *(p+1) = stored_data->data[snvItemID][5];
-                        *(p+0) = stored_data->data[snvItemID][6];
-                        dataPtr ->time = buffer32[0];
-//                        osal_msg_send(simpleBLETaskId,(uint8 *)dataPtr);
-
-                        return;
-                
-                }
-                else
-                {
-                    snvItemID++;
-                }
-          
-            }
-        }
-    }
-}
 void onWriteChar6(uint8 *newChar6Value)
 {
-	    //notify 3----------
-	// uint8 message[1]={0x33};
-	// qq_write(message, 1);
-    // osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
-    //---------------  
+
+  android_ready = true;  //安卓端写了Char6, 说明它已经打开通知了，我可以发notification了
   //如果第三个字节末三位有不为0的，重置时间
   if(newChar6Value[2] & 0x07)   // 0000 0111 
   {
@@ -1368,81 +1193,20 @@ void onWriteChar6(uint8 *newChar6Value)
   }
   else  //主机接收到了我的数据，原封不动地发回来表示收到
   {
-     //--------------
-//      uint8 message[1]={0x66};
-//      qq_write(message, 1);
-//      osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
-    //-----------------------
-	    //notify ----------
-	// uint8 message[1]={0x44};
-	// qq_write(message, 1);
-    // osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
-	//---------------	
+
     //查表找到这一条
     for(int i=0;i<32;i++)
     {
         if(str_cmp(stored_data->data[i],newChar6Value,7))  //如果找到这一条
         {
-			    //notify ----------
-			// uint8 message[1]={0x55};
-			// qq_write(message, 1);
-			// osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
-			//---------------	
+
             //删掉这一条
             int tableIndex = i/8;
             uint8 temp = 0x01;
             temp <<= (i-8*tableIndex);
             stored_data->table[tableIndex] &= ~temp;
-			
-			//-----------------------
-            //我在这儿我在这儿
-//			 uint8 message[5];
-//			 message[0] = 0x55;
-//			 message[1] = i;
-//			 message[2] = tableIndex;
-//			 message[3] = temp;
-//			 message[4] = stored_data->table[tableIndex];
-//			
-//			 qq_write(message, 5);
-//			 osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
-			//-----------------------
-			
-            //onResponseSame 检查有没有存的要发
-            onResponseSame(newChar6Value);
             break;
         }
     } 
   }  
 }
-void onMessage(osal_event_hdr_t *pMsg)
-{
-  key_time_data *dataPtr = (key_time_data *)pMsg ;
-      uint8 buffer[7] = {3}; 
-    
-      notifyKeyTimeData(  dataPtr ,buffer );
-      keyData2Snv(buffer);
-      
-      //自动回复
-      
-     // // 查表找到这一条
-		// for(int i=0;i<32;i++)
-		// {
-			// if(str_cmp(stored_data->data[i],buffer,7))  //如果找到这一条
-			// {
-				
-				// // 删掉这一条
-				// int tableIndex = i/8;
-				// uint8 temp = 0x01;
-				// temp <<= (i-8*tableIndex);
-				// stored_data->table[tableIndex] &= ~temp;
-				// // onResponseSame 检查有没有存的要发
-				// //串口发送
-				// char strTemp[64];
-				// sprintf(strTemp, "自动回复，找到这一条:\r\ni=%d,table[%d] =%d\r\n", i,tableIndex,stored_data->table[tableIndex]);
-				// NPI_WriteTransport(strTemp, osal_strlen(strTemp));
-				// onResponseSame(buffer);
-               // break;
-			// }
-		// }
-}
-      

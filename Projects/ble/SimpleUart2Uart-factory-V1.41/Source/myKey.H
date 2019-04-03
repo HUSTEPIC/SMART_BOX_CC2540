@@ -18,12 +18,7 @@
 #define DEFAULT_UP 1
 #define TABLE_SIZE 4
 #define DATA_SIZE 7
-typedef struct
-{
-  osal_event_hdr_t hdr;
-  uchar keys[3] ;
-  unsigned long time;
-} key_time_data;
+
 
 typedef struct
 {
@@ -34,7 +29,7 @@ typedef struct
 extern uchar currentKeys[3]; 
 extern uchar lastKeys[3];
 extern Stored_data *stored_data;
-
+extern bool android_ready;
 
 void myKey_init();
 uint keyStateChange();
