@@ -145,54 +145,54 @@ void check_keys()
           }
       
      
-      if(KEY1== KEY_DOWN)
+      if(KEY1== KEY_UP)
       {
             Delay_ms(10);
-            if(KEY1==KEY_DOWN)
+            if(KEY1==KEY_UP)
             currentKeys[0] |= 0x01<<7;
       }
      
-      if(KEY2==KEY_DOWN)
+      if(KEY2==KEY_UP)
       {
         Delay_ms(10);
-              if(KEY2==KEY_DOWN)
+              if(KEY2==KEY_UP)
               currentKeys[0] |= 0x01<<6;
                 
       }
-      if(KEY3==KEY_DOWN)
+      if(KEY3==KEY_UP)
       {
         Delay_ms(10);
-            if(KEY3==KEY_DOWN)
+            if(KEY3==KEY_UP)
               currentKeys[0] |= 0x01<<5;
       }
-       if(KEY4==KEY_DOWN)
+       if(KEY4==KEY_UP)
       {
         Delay_ms(10);
-            if(KEY4==KEY_DOWN)
+            if(KEY4==KEY_UP)
               currentKeys[0] |= 0x01<<4;
       }
-             if(KEY5==KEY_DOWN)
+             if(KEY5==KEY_UP)
       {
         Delay_ms(10);
-            if(KEY5==KEY_DOWN)
+            if(KEY5==KEY_UP)
               currentKeys[0] |= 0x01<<3;
       }
-       if(KEY6==KEY_DOWN)
+       if(KEY6==KEY_UP)
       {
         Delay_ms(10);
-            if(KEY6==KEY_DOWN)
+            if(KEY6==KEY_UP)
               currentKeys[0] |= 0x01<<2;
       }
-       if(KEY7==KEY_DOWN)
+       if(KEY7==KEY_UP)
       {
         Delay_ms(10);
-            if(KEY7==KEY_DOWN)
+            if(KEY7==KEY_UP)
               currentKeys[0] |= 0x01<<1;
       }
-       if(KEY8==KEY_DOWN)
+       if(KEY8==KEY_UP)
       {
         Delay_ms(10);
-            if(KEY8==KEY_DOWN)
+            if(KEY8==KEY_UP)
               currentKeys[0] |= 0x01<<0;
       }
   }
