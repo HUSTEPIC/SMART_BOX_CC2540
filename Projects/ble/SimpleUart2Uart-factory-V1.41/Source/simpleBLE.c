@@ -2082,6 +2082,8 @@ void simpleBLE_SendMyData_ForTest()
             }
             else    //如果此时没连上蓝牙，也保存数据
             {
+                qq_write(buffer, BUFFER_SIZE);
+                osal_set_event(simpleBLETaskId, SBP_DATA_EVT); 
                 saveKeyData(buffer);
                 android_ready = false;
             }
