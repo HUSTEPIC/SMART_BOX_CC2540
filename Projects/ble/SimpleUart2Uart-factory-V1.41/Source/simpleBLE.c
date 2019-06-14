@@ -29,7 +29,7 @@
 #include "DHT11.h"
 #include "myKey.h"
 #include "OSAL_Clock.h"
-
+#include "battMeasure.H"
 
 #if 1
 SYS_CONFIG sys_config;
@@ -47,6 +47,7 @@ BLE_CENTRAL_CONNECT_CMD g_Central_connect_cmd  = BLE_CENTRAL_CONNECT_CMD_NULL;
 static void simpleBLE_NpiSerialCallback( uint8 port, uint8 events );
 static bool simpleBLE_AT_CMD_Handle(uint8 *pBuffer, uint16 length);
 static void simpleBLE_SendMyData_ForTest();
+
 #endif
 
 #if 1
@@ -2059,8 +2060,21 @@ void simpleBLE_SendMyData_ForTest()
     static uint16 count_500ms = 0;
     count_100ms++;
 
+    
     if(count_100ms >= 5)//600-60s   //这里的数值秒数的十倍，比如为10就是每隔1s发送一次  //每隔500ms执行以下内容
     {
+         //串口发送
+        // 读取电池电压百分比
+        uint8 percent = battMeasure();
+
+        char strTemp[64];
+        uint8 message[1];
+      
+        sprintf(strTemp, "connected!\r\n");
+        message[0] = percent;
+      
+        //NPI_WriteTransport(strTemp, osal_strlen(strTemp));
+        NPI_WriteTransport(message, 1);
         //如果蓝牙没连上
         if(!simpleBLE_IfConnected())
         {
@@ -2102,5 +2116,3 @@ void simpleBLE_SendMyData_ForTest()
       count_500ms ++;  //每500ms自增
     }
 }
-
-
